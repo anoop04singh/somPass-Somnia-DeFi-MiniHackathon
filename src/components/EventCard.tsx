@@ -6,15 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Calendar, MapPin, Users } from "lucide-react";
-
-export type Event = {
-  id: string;
-  title: string;
-  date: string;
-  location: string;
-  attendees: number;
-  imageUrl: string;
-};
+import { Event } from "@/data/events";
 
 interface EventCardProps {
   event: Event;
@@ -22,7 +14,7 @@ interface EventCardProps {
 
 export const EventCard = ({ event }: EventCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
       <CardHeader className="p-0">
         <img
           src={event.imageUrl}
@@ -30,7 +22,7 @@ export const EventCard = ({ event }: EventCardProps) => {
           className="w-full h-48 object-cover"
         />
       </CardHeader>
-      <CardContent className="p-4">
+      <CardContent className="p-4 flex-grow">
         <CardTitle className="text-lg font-semibold mb-2 truncate">
           {event.title}
         </CardTitle>
