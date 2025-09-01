@@ -42,20 +42,21 @@ const EventDetail = () => {
               Back to all events
             </Link>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+          {/* Main Grid Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Left Column */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-1 space-y-8">
               <img
                 src={event.imageUrl}
                 alt={event.title}
-                className="w-full aspect-[1/1] object-cover rounded-2xl mb-8 shadow-lg"
+                className="w-full aspect-square object-cover rounded-2xl shadow-lg"
               />
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Hosted By</h3>
-                <ul className="space-y-3">
+              <div>
+                <h3 className="font-semibold text-lg mb-4">Hosted By</h3>
+                <ul className="space-y-4">
                   {event.organizers.map((organizer) => (
                     <li key={organizer.name} className="flex items-center gap-3">
-                      <Avatar>
+                      <Avatar className="h-10 w-10">
                         <AvatarImage
                           src={organizer.logoUrl}
                           alt={organizer.name}
@@ -72,15 +73,15 @@ const EventDetail = () => {
             </div>
 
             {/* Right Column */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-2">
               <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
                 {event.title}
               </h1>
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-start gap-4">
-                  <div className="bg-background rounded-lg p-2 mt-1 border">
-                    <Calendar className="w-5 h-5 text-muted-foreground" />
+                  <div className="bg-background rounded-lg p-3 mt-1 border">
+                    <Calendar className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <p className="font-semibold">{event.date}</p>
@@ -88,8 +89,8 @@ const EventDetail = () => {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="bg-background rounded-lg p-2 mt-1 border">
-                    <MapPin className="w-5 h-5 text-muted-foreground" />
+                  <div className="bg-background rounded-lg p-3 mt-1 border">
+                    <MapPin className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <p className="font-semibold">{event.location}</p>
@@ -100,23 +101,23 @@ const EventDetail = () => {
                 </div>
               </div>
 
-              <Card className="bg-background shadow-lg mb-8">
+              <Card className="bg-background shadow-sm mb-8">
                 <CardContent className="p-6">
-                  <div className="flex justify-between items-center mb-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div className="font-semibold text-lg">
                       {event.ticketPrice === 0
                         ? "Free"
                         : `${event.ticketPrice} SOM`}
                     </div>
-                    <Button onClick={handleBuyTicket}>
+                    <Button onClick={handleBuyTicket} size="lg" className="w-full sm:w-auto">
                       <Ticket className="w-4 h-4 mr-2" />
                       Get Ticket
                     </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-sm text-muted-foreground mb-6">
                     {event.ticketSupply - event.attendees} spots left
                   </p>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <Button variant="outline">
                       <Plus className="w-4 h-4 mr-2" /> Add to Calendar
                     </Button>
@@ -128,10 +129,10 @@ const EventDetail = () => {
               </Card>
 
               <div className="prose dark:prose-invert max-w-none">
-                <h2 className="text-2xl font-semibold mb-2">
+                <h2 className="text-2xl font-semibold mb-4">
                   About this event
                 </h2>
-                <p>{event.description}</p>
+                <p className="text-muted-foreground">{event.description}</p>
               </div>
             </div>
           </div>
