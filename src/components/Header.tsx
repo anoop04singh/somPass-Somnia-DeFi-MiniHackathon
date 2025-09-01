@@ -21,6 +21,12 @@ export const Header = () => {
           >
             Create Event
           </Link>
+          <Link
+            to="/my-tickets"
+            className="text-muted-foreground hover:text-primary transition-colors"
+          >
+            My Tickets
+          </Link>
         </nav>
         <Button>Connect Wallet</Button>
       </div>
