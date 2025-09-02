@@ -9,7 +9,6 @@ import {
   Ticket,
   ArrowLeft,
   Share2,
-  Plus,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { showSuccess } from "@/utils/toast";
@@ -133,20 +132,13 @@ const EventDetail = () => {
                   <p className="text-sm text-white/60 mb-6">
                     {event.ticketSupply - event.attendees} spots left
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <Button
-                      variant="ghost"
-                      className="bg-white/10 hover:bg-white/20"
-                    >
-                      <Plus className="w-4 h-4 mr-2" /> Add to Calendar
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="bg-white/10 hover:bg-white/20"
-                    >
-                      <Share2 className="w-4 h-4 mr-2" /> Invite a Friend
-                    </Button>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    className="w-full bg-white/10 hover:bg-white/20"
+                    onClick={() => showSuccess("Invite link copied to clipboard!")}
+                  >
+                    <Share2 className="w-4 h-4 mr-2" /> Invite a Friend
+                  </Button>
                 </CardContent>
               </Card>
 

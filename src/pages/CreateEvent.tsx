@@ -8,14 +8,11 @@ import {
   Ticket,
   UserCheck,
   Users,
-  X,
-  Settings,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { showSuccess } from "@/utils/toast";
 import { motion } from "framer-motion";
@@ -66,49 +63,21 @@ const CreateEvent = () => {
                 }}
               ></div>
               <h2 className="text-3xl font-bold tracking-widest z-10 text-white/80">
-                YOU ARE INVITED
+                EVENT IMAGE
               </h2>
               <Button
                 size="icon"
                 className="absolute bottom-4 right-4 bg-white/10 hover:bg-white/20 rounded-full h-11 w-11"
+                onClick={() => showSuccess("Image upload feature coming soon!")}
               >
                 <Camera size={20} />
-              </Button>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <span className="text-white/80">Theme</span>
-              <div className="flex items-center gap-2 px-3 py-2 bg-white/10 rounded-md">
-                <div className="w-4 h-4 rounded-sm bg-gradient-to-br from-purple-300 to-white"></div>
-                <span>Minimal</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="bg-white/10 hover:bg-white/20"
-              >
-                <Settings size={16} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="bg-white/10 hover:bg-white/20"
-              >
-                <X size={16} />
               </Button>
             </div>
           </div>
 
           <div className="space-y-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-6 w-6">
-                  <AvatarFallback className="bg-red-400"></AvatarFallback>
-                </Avatar>
-                <span className="text-base text-white/80">
-                  Personal Calendar
-                </span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-2 bg-white/10 rounded-md text-sm cursor-pointer">
+            <div className="flex items-center justify-end">
+              <div className="flex items-center gap-2 px-3 py-2 bg-white/10 rounded-md text-sm cursor-pointer" onClick={() => showSuccess("Privacy settings coming soon!")}>
                 <Globe size={14} />
                 <span>Public</span>
               </div>

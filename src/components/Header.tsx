@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { Search, Bell } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { showSuccess } from "@/utils/toast";
 
 export const Header = () => {
   const location = useLocation();
@@ -40,6 +41,7 @@ export const Header = () => {
             variant="ghost"
             size="icon"
             className="opacity-70 hover:opacity-100 transition-opacity"
+            onClick={() => showSuccess("Search feature coming soon!")}
           >
             <Search size={18} />
           </Button>
@@ -47,6 +49,7 @@ export const Header = () => {
             variant="ghost"
             size="icon"
             className="opacity-70 hover:opacity-100 transition-opacity"
+            onClick={() => showSuccess("Notifications will appear here!")}
           >
             <Bell size={18} />
           </Button>
