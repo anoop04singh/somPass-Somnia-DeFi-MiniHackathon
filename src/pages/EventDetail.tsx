@@ -35,20 +35,18 @@ const EventDetail = () => {
       }}
     >
       <Header />
-      <main className="flex-grow container mx-auto p-4 md:p-8">
+      <main className="flex-grow container mx-auto px-6 py-10 pt-28">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <Link
               to="/"
-              className="inline-flex items-center text-sm font-medium text-white/70 hover:text-white"
+              className="inline-flex items-center text-sm font-medium text-white/60 hover:text-white transition-opacity"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to all events
             </Link>
           </div>
-          {/* Main Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-            {/* Left Column */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-16">
             <div className="lg:col-span-1 space-y-8">
               <img
                 src={event.imageUrl}
@@ -56,7 +54,7 @@ const EventDetail = () => {
                 className="w-full aspect-square object-cover rounded-2xl shadow-lg"
               />
               <div>
-                <h3 className="font-semibold text-lg mb-4">Hosted By</h3>
+                <h3 className="font-semibold text-xl mb-4">Hosted By</h3>
                 <ul className="space-y-4">
                   {event.organizers.map((organizer) => (
                     <li
@@ -72,43 +70,42 @@ const EventDetail = () => {
                           {organizer.name.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="font-medium">{organizer.name}</span>
+                      <span className="font-medium text-white/80">{organizer.name}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
 
-            {/* Right Column */}
             <div className="lg:col-span-2">
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
+              <h1 className="text-5xl font-bold tracking-tight mb-6">
                 {event.title}
               </h1>
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-start gap-4">
-                  <div className="bg-white/10 rounded-lg p-3 mt-1 border border-white/20">
+                  <div className="bg-white/10 rounded-lg p-3 mt-1 border border-white/10">
                     <Calendar className="w-5 h-5 text-white/80" />
                   </div>
                   <div>
                     <p className="font-semibold">{event.date}</p>
-                    <p className="text-white/70 text-sm">{`${event.startTime} - ${event.endTime}`}</p>
+                    <p className="text-white/60 text-sm">{`${event.startTime} - ${event.endTime}`}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="bg-white/10 rounded-lg p-3 mt-1 border border-white/20">
+                  <div className="bg-white/10 rounded-lg p-3 mt-1 border border-white/10">
                     <MapPin className="w-5 h-5 text-white/80" />
                   </div>
                   <div>
                     <p className="font-semibold">{event.location}</p>
-                    <p className="text-white/70 text-sm">
+                    <p className="text-white/60 text-sm">
                       {event.locationDetail}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <Card className="bg-white/10 border border-white/20 shadow-sm mb-8">
+              <Card className="bg-white/10 backdrop-blur-lg border border-white/10 shadow-sm mb-8 rounded-xl">
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div className="font-semibold text-lg">
@@ -125,19 +122,19 @@ const EventDetail = () => {
                       Get Ticket
                     </Button>
                   </div>
-                  <p className="text-sm text-white/70 mb-6">
+                  <p className="text-sm text-white/60 mb-6">
                     {event.ticketSupply - event.attendees} spots left
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <Button
-                      variant="outline"
-                      className="bg-transparent border-white/30 hover:bg-white/10"
+                      variant="ghost"
+                      className="bg-white/10 hover:bg-white/20"
                     >
                       <Plus className="w-4 h-4 mr-2" /> Add to Calendar
                     </Button>
                     <Button
-                      variant="outline"
-                      className="bg-transparent border-white/30 hover:bg-white/10"
+                      variant="ghost"
+                      className="bg-white/10 hover:bg-white/20"
                     >
                       <Share2 className="w-4 h-4 mr-2" /> Invite a Friend
                     </Button>

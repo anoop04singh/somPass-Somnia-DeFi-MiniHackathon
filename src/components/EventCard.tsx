@@ -28,13 +28,13 @@ export const EventCard = ({ event }: EventCardProps) => {
         </div>
       </CardHeader>
       <CardContent className="p-0 flex-grow">
-        <p className="text-sm font-semibold text-green-300 mb-1">
+        <p className="text-sm font-semibold text-white/80 mb-1">
           {event.date.toUpperCase()}
         </p>
-        <CardTitle className="text-lg font-bold text-white mb-2 leading-tight">
+        <CardTitle className="text-lg font-semibold text-white mb-2 leading-tight">
           {event.title}
         </CardTitle>
-        <div className="flex items-center text-sm text-white/70">
+        <div className="flex items-center text-sm text-white/60">
           <MapPin className="w-4 h-4 mr-1.5 flex-shrink-0" />
           <span>{event.location}</span>
         </div>
@@ -48,7 +48,7 @@ export const EventCard = ({ event }: EventCardProps) => {
             />
             <AvatarFallback>{primaryOrganizer.name.charAt(0)}</AvatarFallback>
           </Avatar>
-          <span className="text-xs text-white/70">{primaryOrganizer.name}</span>
+          <span className="text-xs text-white/60">{primaryOrganizer.name}</span>
         </div>
       </CardFooter>
     </Card>

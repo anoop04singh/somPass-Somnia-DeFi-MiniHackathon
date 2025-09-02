@@ -12,8 +12,8 @@ const Index = () => {
       }}
     >
       <Header />
-      <main className="container mx-auto p-4 md:p-8 flex-grow">
-        <h1 className="text-4xl font-bold mb-8 tracking-tight">
+      <main className="container mx-auto px-6 py-10 pt-28 flex-grow">
+        <h1 className="text-5xl font-bold mb-10 tracking-tight">
           Upcoming Events
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">

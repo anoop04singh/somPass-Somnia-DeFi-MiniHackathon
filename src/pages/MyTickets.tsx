@@ -14,8 +14,8 @@ const MyTickets = () => {
       }}
     >
       <Header />
-      <main className="container mx-auto p-4 md:p-8 flex-grow">
-        <h1 className="text-4xl font-bold tracking-tight mb-8">My Tickets</h1>
+      <main className="container mx-auto px-6 py-10 pt-28 flex-grow">
+        <h1 className="text-5xl font-bold tracking-tight mb-8">My Tickets</h1>
         {mockUserTickets.length > 0 ? (
           <div className="space-y-6">
             {mockUserTickets.map((ticket) => (
@@ -23,10 +23,10 @@ const MyTickets = () => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center text-center py-24 border-2 border-dashed border-white/20 rounded-lg bg-white/5">
-            <Ticket className="w-16 h-16 text-white/50 mb-4" />
+          <div className="flex flex-col items-center justify-center text-center py-24 rounded-lg bg-white/5">
+            <Ticket className="w-16 h-16 text-white/40 mb-4" />
             <h2 className="text-2xl font-semibold">No tickets yet!</h2>
-            <p className="text-white/70 mt-2 mb-6 max-w-sm">
+            <p className="text-white/60 mt-2 mb-6 max-w-sm">
               When you buy a ticket for an event, it will show up here where you
               can easily access it.
             </p>

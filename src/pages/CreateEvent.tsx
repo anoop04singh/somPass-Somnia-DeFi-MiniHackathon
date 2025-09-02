@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Header } from "@/components/Header";
 import {
   Camera,
   Globe,
@@ -9,67 +10,14 @@ import {
   Users,
   X,
   Settings,
-  Search,
-  Bell,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { showError, showSuccess } from "@/utils/toast";
-
-// A custom header component specific to this page, based on the HTML file
-const CreateEventHeader = () => (
-  <header className="flex justify-between items-center p-4 md:p-6 text-white">
-    <div className="flex items-center gap-8">
-      <a href="/" className="text-lg font-medium">
-        ✦
-      </a>
-      <nav className="hidden md:flex items-center gap-8">
-        <a
-          href="#"
-          className="flex items-center gap-2 text-sm font-medium opacity-100"
-        >
-          📅 Events
-        </a>
-        <a
-          href="#"
-          className="flex items-center gap-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
-        >
-          📆 Calendars
-        </a>
-        <a
-          href="#"
-          className="flex items-center gap-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
-        >
-          🔍 Discover
-        </a>
-      </nav>
-    </div>
-    <div className="flex items-center gap-4 md:gap-6">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="opacity-70 hover:opacity-100 hover:bg-white/10"
-      >
-        <Search size={18} />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="opacity-70 hover:opacity-100 hover:bg-white/10"
-      >
-        <Bell size={18} />
-      </Button>
-      <Avatar className="h-8 w-8">
-        <AvatarFallback className="bg-white text-green-900 font-bold">
-          S
-        </AvatarFallback>
-      </Avatar>
-    </div>
-  </header>
-);
+import { Card } from "@/components/ui/card";
+import { showSuccess } from "@/utils/toast";
 
 const CreateEvent = () => {
   const [eventName, setEventName] = useState("Event Name");
@@ -89,7 +37,6 @@ const CreateEvent = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted");
     showSuccess("Event created successfully! (Simulation)");
   };
 
@@ -100,12 +47,11 @@ const CreateEvent = () => {
       }}
       className="min-h-screen text-white font-sans"
     >
-      <CreateEventHeader />
-      <main className="max-w-7xl mx-auto p-6 md:p-10">
+      <Header />
+      <main className="max-w-7xl mx-auto px-6 py-10 pt-28">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-          {/* Left Side - Image Section */}
-          <div className="space-y-4 sticky top-10">
-            <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center overflow-hidden">
+          <div className="space-y-4 sticky top-28">
+            <div className="relative aspect-[4/3] bg-black/20 rounded-xl flex items-center justify-center overflow-hidden">
               <div
                 className="absolute inset-0"
                 style={{
@@ -113,18 +59,18 @@ const CreateEvent = () => {
                     "repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255, 255, 255, 0.05) 2px, rgba(255, 255, 255, 0.05) 20px)",
                 }}
               ></div>
-              <h2 className="text-3xl font-bold tracking-widest z-10">
+              <h2 className="text-3xl font-bold tracking-widest z-10 text-white/80">
                 YOU ARE INVITED
               </h2>
               <Button
                 size="icon"
-                className="absolute bottom-4 right-4 bg-white/20 hover:bg-white/30 rounded-full h-11 w-11"
+                className="absolute bottom-4 right-4 bg-white/10 hover:bg-white/20 rounded-full h-11 w-11"
               >
                 <Camera size={20} />
               </Button>
             </div>
             <div className="flex items-center gap-3 text-sm">
-              <span className="opacity-80">Theme</span>
+              <span className="text-white/80">Theme</span>
               <div className="flex items-center gap-2 px-3 py-2 bg-white/10 rounded-md">
                 <div className="w-4 h-4 rounded-sm bg-gradient-to-br from-purple-300 to-white"></div>
                 <span>Minimal</span>
@@ -146,14 +92,13 @@ const CreateEvent = () => {
             </div>
           </div>
 
-          {/* Right Side - Form Section */}
           <div className="space-y-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Avatar className="h-6 w-6">
                   <AvatarFallback className="bg-red-400"></AvatarFallback>
                 </Avatar>
-                <span className="text-base">Personal Calendar</span>
+                <span className="text-base text-white/80">Personal Calendar</span>
               </div>
               <div className="flex items-center gap-2 px-3 py-2 bg-white/10 rounded-md text-sm cursor-pointer">
                 <Globe size={14} />
@@ -168,7 +113,7 @@ const CreateEvent = () => {
                 onBlur={handleNameBlur}
                 onKeyDown={handleNameKeyDown}
                 autoFocus
-                className="text-5xl font-bold bg-transparent border-white/30 h-auto p-2 focus-visible:ring-white"
+                className="text-5xl font-bold bg-transparent border-white/20 h-auto p-2 focus-visible:ring-white"
               />
             ) : (
               <h1
@@ -183,7 +128,7 @@ const CreateEvent = () => {
               <div className="space-y-4">
                 <div className="flex items-center gap-4 text-sm">
                   <div className="w-5 h-5 bg-white/30 rounded-full"></div>
-                  <span className="opacity-80 w-12">Start</span>
+                  <span className="text-white/80 w-12">Start</span>
                   <Input
                     type="date"
                     className="bg-white/10 border-white/20"
@@ -197,7 +142,7 @@ const CreateEvent = () => {
                 </div>
                 <div className="flex items-center gap-4 text-sm">
                   <div className="w-5 h-5 border-2 border-white/30 rounded-full"></div>
-                  <span className="opacity-80 w-12">End</span>
+                  <span className="text-white/80 w-12">End</span>
                   <Input
                     type="date"
                     className="bg-white/10 border-white/20"
@@ -217,7 +162,7 @@ const CreateEvent = () => {
                   placeholder="📍 Add Event Location"
                   className="bg-white/10 border-white/20 placeholder:text-white/60 h-12"
                 />
-                <p className="text-sm opacity-60 mt-1">
+                <p className="text-sm text-white/60 mt-1">
                   Offline location or virtual link
                 </p>
               </div>
@@ -227,37 +172,35 @@ const CreateEvent = () => {
                 className="bg-white/10 border-white/20 placeholder:text-white/60 min-h-[100px]"
               />
 
-              <div className="pt-4">
-                <h3 className="text-lg font-semibold mb-2 opacity-90">
+              <Card className="bg-transparent border-y border-white/10 rounded-none shadow-none">
+                <h3 className="text-lg font-semibold mb-2 text-white/80 sr-only">
                   Event Options
                 </h3>
-                <div className="border-y border-white/10">
-                  <div className="flex items-center justify-between py-4">
-                    <div className="flex items-center gap-3">
-                      <Ticket size={20} className="opacity-70" />
-                      <span>Tickets</span>
-                    </div>
-                    <span className="opacity-80">Free 🔗</span>
+                <div className="flex items-center justify-between py-4">
+                  <div className="flex items-center gap-3">
+                    <Ticket size={20} className="text-white/60" />
+                    <span className="text-white/80">Tickets</span>
                   </div>
-                  <div className="flex items-center justify-between py-4 border-t border-white/10">
-                    <div className="flex items-center gap-3">
-                      <UserCheck size={20} className="opacity-70" />
-                      <span>Require Approval</span>
-                    </div>
-                    <Switch
-                      checked={requireApproval}
-                      onCheckedChange={setRequireApproval}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between py-4 border-t border-white/10">
-                    <div className="flex items-center gap-3">
-                      <Users size={20} className="opacity-70" />
-                      <span>Capacity</span>
-                    </div>
-                    <span className="opacity-80">Unlimited 🔗</span>
-                  </div>
+                  <span className="text-white/60">Free 🔗</span>
                 </div>
-              </div>
+                <div className="flex items-center justify-between py-4 border-t border-white/10">
+                  <div className="flex items-center gap-3">
+                    <UserCheck size={20} className="text-white/60" />
+                    <span className="text-white/80">Require Approval</span>
+                  </div>
+                  <Switch
+                    checked={requireApproval}
+                    onCheckedChange={setRequireApproval}
+                  />
+                </div>
+                <div className="flex items-center justify-between py-4 border-t border-white/10">
+                  <div className="flex items-center gap-3">
+                    <Users size={20} className="text-white/60" />
+                    <span className="text-white/80">Capacity</span>
+                  </div>
+                  <span className="text-white/60">Unlimited 🔗</span>
+                </div>
+              </Card>
 
               <Button
                 type="submit"
