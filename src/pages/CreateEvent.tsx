@@ -2,13 +2,7 @@
 
 import React, { useState } from "react";
 import { Header } from "@/components/Header";
-import {
-  Camera,
-  Globe,
-  Ticket,
-  UserCheck,
-  Users,
-} from "lucide-react";
+import { Camera, Globe, Ticket, UserCheck, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -17,11 +11,15 @@ import { Card } from "@/components/ui/card";
 import { showSuccess } from "@/utils/toast";
 import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
+import { useAlertStore } from "@/hooks/use-alert";
+import { useNavigate } from "react-router-dom";
 
 const CreateEvent = () => {
   const [eventName, setEventName] = useState("Event Name");
   const [isEditingName, setIsEditingName] = useState(false);
   const [requireApproval, setRequireApproval] = useState(true);
+  const showConfirmation = useAlertStore((state) => state.showConfirmation);
+  const navigate = useNavigate();
 
   const handleNameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setEventName(e.target.value || "Event Name");
@@ -37,6 +35,18 @@ const CreateEvent = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     showSuccess("Event created successfully! (Simulation)");
+  };
+
+  const handleCancel = () => {
+    showConfirmation({
+      title: "Are you sure?",
+      description:
+        "Any unsaved changes will be lost. Are you sure you want to cancel creating this event?",
+      confirmText: "Yes, Cancel",
+      onConfirm: () => {
+        navigate("/");
+      },
+    });
   };
 
   return (
@@ -77,7 +87,10 @@ const CreateEvent = () => {
 
           <div className="space-y-8">
             <div className="flex items-center justify-end">
-              <div className="flex items-center gap-2 px-3 py-2 bg-white/10 rounded-md text-sm cursor-pointer" onClick={() => showSuccess("Privacy settings coming soon!")}>
+              <div
+                className="flex items-center gap-2 px-3 py-2 bg-white/10 rounded-md text-sm cursor-pointer"
+                onClick={() => showSuccess("Privacy settings coming soon!")}
+              >
                 <Globe size={14} />
                 <span>Public</span>
               </div>
@@ -179,12 +192,22 @@ const CreateEvent = () => {
                 </div>
               </Card>
 
-              <Button
-                type="submit"
-                className="w-full bg-white text-green-900 font-bold text-base h-12 hover:bg-gray-200"
-              >
-                Create Event
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full bg-transparent border-white/30 hover:bg-white/10"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="w-full bg-white text-green-900 font-bold text-base h-12 hover:bg-gray-200"
+                >
+                  Create Event
+                </Button>
+              </div>
             </form>
           </div>
         </div>

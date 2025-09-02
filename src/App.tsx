@@ -9,6 +9,7 @@ import EventDetail from "./pages/EventDetail";
 import MyTickets from "./pages/MyTickets";
 import NotFound from "./pages/NotFound";
 import { AnimatePresence } from "framer-motion";
+import { AlertProvider } from "./components/AlertProvider";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <AlertProvider />
       <BrowserRouter>
         <AnimatedRoutes />
       </BrowserRouter>
