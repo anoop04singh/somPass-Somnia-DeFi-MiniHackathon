@@ -18,6 +18,8 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { showSuccess } from "@/utils/toast";
+import { motion } from "framer-motion";
+import { pageTransition } from "@/lib/animations";
 
 const CreateEvent = () => {
   const [eventName, setEventName] = useState("Event Name");
@@ -41,7 +43,11 @@ const CreateEvent = () => {
   };
 
   return (
-    <div
+    <motion.div
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageTransition}
       style={{
         background: "linear-gradient(135deg, #2d5a3d 0%, #3d6b4a 100%)",
       }}
@@ -98,7 +104,9 @@ const CreateEvent = () => {
                 <Avatar className="h-6 w-6">
                   <AvatarFallback className="bg-red-400"></AvatarFallback>
                 </Avatar>
-                <span className="text-base text-white/80">Personal Calendar</span>
+                <span className="text-base text-white/80">
+                  Personal Calendar
+                </span>
               </div>
               <div className="flex items-center gap-2 px-3 py-2 bg-white/10 rounded-md text-sm cursor-pointer">
                 <Globe size={14} />
@@ -212,7 +220,7 @@ const CreateEvent = () => {
           </div>
         </div>
       </main>
-    </div>
+    </motion.div>
   );
 };
 

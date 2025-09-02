@@ -4,10 +4,20 @@ import { mockUserTickets } from "@/data/tickets";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Ticket } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  pageTransition,
+  containerVariants,
+  itemVariants,
+} from "@/lib/animations";
 
 const MyTickets = () => {
   return (
-    <div
+    <motion.div
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageTransition}
       className="min-h-screen text-white"
       style={{
         background: "linear-gradient(135deg, #2d5a3d 0%, #3d6b4a 100%)",
@@ -15,13 +25,27 @@ const MyTickets = () => {
     >
       <Header />
       <main className="container mx-auto px-6 py-10 pt-28 flex-grow">
-        <h1 className="text-5xl font-bold tracking-tight mb-8">My Tickets</h1>
+        <motion.h1
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-5xl font-bold tracking-tight mb-8"
+        >
+          My Tickets
+        </motion.h1>
         {mockUserTickets.length > 0 ? (
-          <div className="space-y-6">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-6"
+          >
             {mockUserTickets.map((ticket) => (
-              <TicketCard key={ticket.id} ticket={ticket} />
+              <motion.div key={ticket.id} variants={itemVariants}>
+                <TicketCard ticket={ticket} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         ) : (
           <div className="flex flex-col items-center justify-center text-center py-24 rounded-lg bg-white/5">
             <Ticket className="w-16 h-16 text-white/40 mb-4" />
@@ -39,7 +63,7 @@ const MyTickets = () => {
           </div>
         )}
       </main>
-    </div>
+    </motion.div>
   );
 };
 

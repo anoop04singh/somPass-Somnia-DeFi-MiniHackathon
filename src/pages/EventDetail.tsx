@@ -14,6 +14,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { showSuccess } from "@/utils/toast";
 import NotFound from "./NotFound";
+import { motion } from "framer-motion";
+import { pageTransition } from "@/lib/animations";
 
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,7 +30,11 @@ const EventDetail = () => {
   };
 
   return (
-    <div
+    <motion.div
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageTransition}
       className="min-h-screen text-white"
       style={{
         background: "linear-gradient(135deg, #2d5a3d 0%, #3d6b4a 100%)",
@@ -70,7 +76,9 @@ const EventDetail = () => {
                           {organizer.name.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="font-medium text-white/80">{organizer.name}</span>
+                      <span className="font-medium text-white/80">
+                        {organizer.name}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -152,7 +160,7 @@ const EventDetail = () => {
           </div>
         </div>
       </main>
-    </div>
+    </motion.div>
   );
 };
 

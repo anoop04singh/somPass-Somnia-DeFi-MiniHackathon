@@ -2,10 +2,20 @@ import { Header } from "@/components/Header";
 import { EventCard } from "@/components/EventCard";
 import { mockEvents } from "@/data/events";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  pageTransition,
+  containerVariants,
+  itemVariants,
+} from "@/lib/animations";
 
 const Index = () => {
   return (
-    <div
+    <motion.div
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageTransition}
       className="min-h-screen text-white"
       style={{
         background: "linear-gradient(135deg, #2d5a3d 0%, #3d6b4a 100%)",
@@ -13,18 +23,30 @@ const Index = () => {
     >
       <Header />
       <main className="container mx-auto px-6 py-10 pt-28 flex-grow">
-        <h1 className="text-5xl font-bold mb-10 tracking-tight">
+        <motion.h1
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-5xl font-bold mb-10 tracking-tight"
+        >
           Upcoming Events
-        </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
+        </motion.h1>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10"
+        >
           {mockEvents.map((event) => (
-            <Link to={`/event/${event.id}`} key={event.id}>
-              <EventCard event={event} />
-            </Link>
+            <motion.div key={event.id} variants={itemVariants}>
+              <Link to={`/event/${event.id}`}>
+                <EventCard event={event} />
+              </Link>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </main>
-    </div>
+    </motion.div>
   );
 };
 
