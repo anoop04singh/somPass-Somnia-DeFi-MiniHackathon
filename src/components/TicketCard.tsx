@@ -10,7 +10,7 @@ interface TicketCardProps {
 export const TicketCard = ({ ticket }: TicketCardProps) => {
   const { event } = ticket;
   return (
-    <Card className="overflow-hidden transition-shadow hover:shadow-lg bg-background">
+    <Card className="overflow-hidden transition-shadow hover:shadow-lg bg-white/5 border border-white/10 rounded-xl">
       <div className="flex flex-col sm:flex-row">
         <img
           src={event.imageUrl}
@@ -19,12 +19,12 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
         />
         <div className="flex flex-col justify-between p-6 flex-grow">
           <div>
-            <h2 className="text-xl font-semibold mb-2">
+            <h2 className="text-xl font-semibold mb-2 text-white">
               <Link to={`/event/${event.id}`} className="hover:underline">
                 {event.title}
               </Link>
             </h2>
-            <div className="space-y-2 text-sm text-muted-foreground">
+            <div className="space-y-2 text-sm text-white/70">
               <div className="flex items-center">
                 <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
                 <span>{`${event.date} at ${event.startTime}`}</span>
@@ -35,14 +35,14 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
               </div>
             </div>
           </div>
-          <div className="mt-4 text-xs text-muted-foreground">
+          <div className="mt-4 text-xs text-white/60">
             Purchased on: {ticket.purchaseDate}
           </div>
         </div>
-        <div className="flex items-center justify-center p-6 bg-muted/40 border-t sm:border-t-0 sm:border-l">
+        <div className="flex items-center justify-center p-6 bg-black/20 border-t sm:border-t-0 sm:border-l border-white/10">
           <div className="flex flex-col items-center gap-2 text-center">
-            <QrCode className="w-20 h-20 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground"># {ticket.id}</span>
+            <QrCode className="w-20 h-20 text-white/70" />
+            <span className="text-xs text-white/60"># {ticket.id}</span>
           </div>
         </div>
       </div>

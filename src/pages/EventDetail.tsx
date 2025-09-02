@@ -1,7 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { mockEvents } from "@/data/events";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -29,14 +28,19 @@ const EventDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted/20 text-foreground flex flex-col">
+    <div
+      className="min-h-screen text-white"
+      style={{
+        background: "linear-gradient(135deg, #2d5a3d 0%, #3d6b4a 100%)",
+      }}
+    >
       <Header />
       <main className="flex-grow container mx-auto p-4 md:p-8">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <Link
               to="/"
-              className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary"
+              className="inline-flex items-center text-sm font-medium text-white/70 hover:text-white"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to all events
@@ -55,7 +59,10 @@ const EventDetail = () => {
                 <h3 className="font-semibold text-lg mb-4">Hosted By</h3>
                 <ul className="space-y-4">
                   {event.organizers.map((organizer) => (
-                    <li key={organizer.name} className="flex items-center gap-3">
+                    <li
+                      key={organizer.name}
+                      className="flex items-center gap-3"
+                    >
                       <Avatar className="h-10 w-10">
                         <AvatarImage
                           src={organizer.logoUrl}
@@ -80,28 +87,28 @@ const EventDetail = () => {
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-start gap-4">
-                  <div className="bg-background rounded-lg p-3 mt-1 border">
-                    <Calendar className="w-5 h-5 text-primary" />
+                  <div className="bg-white/10 rounded-lg p-3 mt-1 border border-white/20">
+                    <Calendar className="w-5 h-5 text-white/80" />
                   </div>
                   <div>
                     <p className="font-semibold">{event.date}</p>
-                    <p className="text-muted-foreground text-sm">{`${event.startTime} - ${event.endTime}`}</p>
+                    <p className="text-white/70 text-sm">{`${event.startTime} - ${event.endTime}`}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="bg-background rounded-lg p-3 mt-1 border">
-                    <MapPin className="w-5 h-5 text-primary" />
+                  <div className="bg-white/10 rounded-lg p-3 mt-1 border border-white/20">
+                    <MapPin className="w-5 h-5 text-white/80" />
                   </div>
                   <div>
                     <p className="font-semibold">{event.location}</p>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-white/70 text-sm">
                       {event.locationDetail}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <Card className="bg-background shadow-sm mb-8">
+              <Card className="bg-white/10 border border-white/20 shadow-sm mb-8">
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                     <div className="font-semibold text-lg">
@@ -109,36 +116,45 @@ const EventDetail = () => {
                         ? "Free"
                         : `${event.ticketPrice} SOM`}
                     </div>
-                    <Button onClick={handleBuyTicket} size="lg" className="w-full sm:w-auto">
+                    <Button
+                      onClick={handleBuyTicket}
+                      size="lg"
+                      className="w-full sm:w-auto bg-white text-green-900 font-bold hover:bg-gray-200"
+                    >
                       <Ticket className="w-4 h-4 mr-2" />
                       Get Ticket
                     </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-6">
+                  <p className="text-sm text-white/70 mb-6">
                     {event.ticketSupply - event.attendees} spots left
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <Button variant="outline">
+                    <Button
+                      variant="outline"
+                      className="bg-transparent border-white/30 hover:bg-white/10"
+                    >
                       <Plus className="w-4 h-4 mr-2" /> Add to Calendar
                     </Button>
-                    <Button variant="outline">
+                    <Button
+                      variant="outline"
+                      className="bg-transparent border-white/30 hover:bg-white/10"
+                    >
                       <Share2 className="w-4 h-4 mr-2" /> Invite a Friend
                     </Button>
                   </div>
                 </CardContent>
               </Card>
 
-              <div className="prose dark:prose-invert max-w-none">
+              <div className="prose prose-invert max-w-none">
                 <h2 className="text-2xl font-semibold mb-4">
                   About this event
                 </h2>
-                <p className="text-muted-foreground">{event.description}</p>
+                <p className="text-white/80">{event.description}</p>
               </div>
             </div>
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

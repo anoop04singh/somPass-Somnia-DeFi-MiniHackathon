@@ -1,12 +1,16 @@
 import { Header } from "@/components/Header";
 import { EventCard } from "@/components/EventCard";
-import { Footer } from "@/components/Footer";
 import { mockEvents } from "@/data/events";
 import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div
+      className="min-h-screen text-white"
+      style={{
+        background: "linear-gradient(135deg, #2d5a3d 0%, #3d6b4a 100%)",
+      }}
+    >
       <Header />
       <main className="container mx-auto p-4 md:p-8 flex-grow">
         <h1 className="text-4xl font-bold mb-8 tracking-tight">
@@ -20,7 +24,6 @@ const Index = () => {
           ))}
         </div>
       </main>
-      <Footer />
     </div>
   );
 };
