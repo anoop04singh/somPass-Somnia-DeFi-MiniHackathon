@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import CreateEvent from "./pages/CreateEvent";
 import EventDetail from "./pages/EventDetail";
 import MyTickets from "./pages/MyTickets";
+import Dashboard from "./pages/Dashboard";
+import ManageEvent from "./pages/ManageEvent";
 import NotFound from "./pages/NotFound";
 import { AnimatePresence } from "framer-motion";
 import { AlertProvider } from "./components/AlertProvider";
@@ -22,6 +24,8 @@ const AnimatedRoutes = () => {
         <Route path="/create" element={<CreateEvent />} />
         <Route path="/event/:id" element={<EventDetail />} />
         <Route path="/my-tickets" element={<MyTickets />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/event/:id" element={<ManageEvent />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

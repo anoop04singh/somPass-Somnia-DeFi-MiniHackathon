@@ -22,6 +22,7 @@ export const Header = () => {
     { href: "/", label: "Discover" },
     { href: "/create", label: "Create Event" },
     { href: "/my-tickets", label: "My Tickets" },
+    { href: "/dashboard", label: "Dashboard" },
   ];
 
   return (
@@ -41,7 +42,7 @@ export const Header = () => {
                   key={item.href}
                   to={item.href}
                   className={`text-sm transition-opacity ${
-                    location.pathname === item.href
+                    location.pathname === item.href || (item.href === "/dashboard" && location.pathname.startsWith("/dashboard"))
                       ? "opacity-100"
                       : "opacity-70 hover:opacity-100"
                   }`}
