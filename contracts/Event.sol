@@ -6,60 +6,47 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Event is ERC721, Ownable {
     string public metadataCID;
-    uint256 public immutable ticketPrice;
-    uint256 public immutable maxTickets;
-    
-    uint256 private _nextTokenId;
-    mapping(uint256 => bool) public hasAttended;
-    string public attendanceCID;
+    uint256 public ticketPrice;
+    uint256 public maxTickets;
+    uint256 public totalTicketsSold;
 
-    event TicketCheckedIn(uint256 indexed tokenId, address indexed owner);
+    mapping(uint256 => bool) private _hasAttended;
+
+    event TicketCheckedIn(uint256 indexed tokenId, address indexed attendee);
 
     constructor(
         address initialOwner,
         string memory _metadataCID,
         uint256 _ticketPrice,
         uint256 _maxTickets
-    ) ERC721("SomPass Event Ticket", "SPET") Ownable(initialOwner) {
+    ) ERC721("SomPass Ticket", "SPT") Ownable(initialOwner) {
         metadataCID = _metadataCID;
         ticketPrice = _ticketPrice;
         maxTickets = _maxTickets;
     }
 
     function buyTicket() public payable {
-        require(msg.value >= ticketPrice, "Incorrect payment amount");
-        require(_nextTokenId < maxTickets, "All tickets have been sold");
+        require(totalTicketsSold < maxTickets, "All tickets have been sold");
+        require(msg.value >= ticketPrice, "Insufficient funds to buy ticket");
 
-        uint256 tokenId = _nextTokenId;
-        _nextTokenId++;
+        uint256 tokenId = totalTicketsSold;
+        totalTicketsSold++;
         _safeMint(msg.sender, tokenId);
-
-        // Refund any overpayment
-        if (msg.value > ticketPrice) {
-            payable(msg.sender).transfer(msg.value - ticketPrice);
-        }
     }
 
     function checkIn(uint256 tokenId) public onlyOwner {
-        address owner = ownerOf(tokenId);
-        require(!hasAttended[tokenId], "Ticket has already been used");
-        
-        hasAttended[tokenId] = true;
-        emit TicketCheckedIn(tokenId, owner);
+        require(_exists(tokenId), "Ticket does not exist");
+        require(!_hasAttended[tokenId], "Ticket has already been used");
+        _hasAttended[tokenId] = true;
+        emit TicketCheckedIn(tokenId, ownerOf(tokenId));
     }
 
-    function updateAttendanceCID(string memory _newCID) public onlyOwner {
-        attendanceCID = _newCID;
+    function hasAttended(uint256 tokenId) public view returns (bool) {
+        return _hasAttended[tokenId];
     }
 
     function withdraw() public onlyOwner {
-        uint256 balance = address(this).balance;
-        require(balance > 0, "No funds to withdraw");
-        (bool success, ) = owner().call{value: balance}("");
+        (bool success, ) = owner().call{value: address(this).balance}("");
         require(success, "Withdrawal failed");
-    }
-
-    function totalTicketsSold() public view returns (uint256) {
-        return _nextTokenId;
     }
 }

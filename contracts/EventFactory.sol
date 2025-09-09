@@ -11,7 +11,7 @@ contract EventFactory {
         address indexed organizer,
         string metadataCID,
         uint256 ticketPrice,
-        uint256 maxTickets
+        uint256 ticketSupply
     );
 
     function createEvent(
@@ -26,7 +26,6 @@ contract EventFactory {
             _maxTickets
         );
         allEvents.push(address(newEvent));
-        
         emit EventCreated(
             address(newEvent),
             msg.sender,
