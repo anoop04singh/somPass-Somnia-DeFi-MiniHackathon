@@ -34,7 +34,7 @@ export const DashboardEventCard = ({ event }: DashboardEventCardProps) => {
       </CardContent>
       <CardFooter>
         <Button asChild className="w-full bg-white text-green-900 font-bold hover:bg-gray-200">
-          <Link to={`/dashboard/event/${event.id}`}>Manage Event</Link>
+          <Link to={`/dashboard/event/${event.contractAddress}`}>Manage Event</Link>
         </Button>
       </CardFooter>
     </Card>

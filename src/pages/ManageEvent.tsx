@@ -1,74 +1,119 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, QrCode } from "lucide-react";
-import { mockEvents, Event } from "@/data/events";
-import { mockAttendees, Attendee } from "@/data/attendees";
-import { showSuccess } from "@/utils/toast";
+import { Event } from "@/data/events";
+import { Attendee } from "@/data/attendees";
+import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import NotFound from "./NotFound";
 import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
 import { QRScannerModal } from "@/components/QRScannerModal";
 import { Switch } from "@/components/ui/switch";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ethers } from "ethers";
+import { EVENT_ABI, EVENT_FACTORY_ABI, EVENT_FACTORY_ADDRESS } from "@/lib/constants";
+import { getIPFSUrl } from "@/lib/ipfs";
+import { useWeb3Store } from "@/store/web3Store";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const fetchEventDetail = async (address: string): Promise<Event | null> => {
+  if (!window.ethereum || !address) return null;
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const eventContract = new ethers.Contract(address, EVENT_ABI, provider);
+  const [metadataCID, ticketPrice, ticketSupply, attendees, organizerAddress] = await Promise.all([
+    eventContract.metadataCID(), eventContract.ticketPrice(), eventContract.maxTickets(),
+    eventContract.totalTicketsSold(), eventContract.owner(),
+  ]);
+  const metadata = await (await fetch(getIPFSUrl(metadataCID))).json();
+  return {
+    ...metadata, contractAddress: address, ticketPrice: Number(ethers.formatEther(ticketPrice)),
+    ticketSupply: Number(ticketSupply), attendees: Number(attendees), organizerAddress,
+  };
+};
+
+const fetchAttendees = async (address: string, provider: ethers.Provider): Promise<Attendee[]> => {
+  const eventContract = new ethers.Contract(address, EVENT_ABI, provider);
+  const totalSold = await eventContract.totalTicketsSold();
+  const attendeePromises: Promise<Attendee>[] = [];
+  for (let i = 0; i < Number(totalSold); i++) {
+    attendeePromises.push(
+      (async () => {
+        const tokenId = i;
+        const [walletAddress, isCheckedIn] = await Promise.all([
+          eventContract.ownerOf(tokenId),
+          eventContract.hasAttended(tokenId),
+        ]);
+        return { tokenId: tokenId.toString(), walletAddress, isCheckedIn };
+      })()
+    );
+  }
+  return Promise.all(attendeePromises);
+};
 
 const ManageEvent = () => {
-  const { id } = useParams<{ id: string }>();
-  const [event, setEvent] = useState<Event | undefined>(undefined);
-  const [attendees, setAttendees] = useState<Attendee[]>([]);
+  const { address } = useParams<{ address: string }>();
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const { provider, signer } = useWeb3Store();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const foundEvent = mockEvents.find((e) => e.id === id);
-    setEvent(foundEvent);
-    if (foundEvent) {
-      setAttendees(mockAttendees[foundEvent.id] || []);
+  const { data: event, isLoading: isEventLoading } = useQuery({
+    queryKey: ["event", address],
+    queryFn: () => fetchEventDetail(address!),
+    enabled: !!address,
+  });
+
+  const { data: attendees, isLoading: areAttendeesLoading } = useQuery({
+    queryKey: ["attendees", address],
+    queryFn: () => fetchAttendees(address!, provider!),
+    enabled: !!provider && !!address,
+  });
+
+  const checkInMutation = useMutation({
+    mutationFn: async (tokenId: string) => {
+      if (!signer || !address) throw new Error("Wallet not connected or event address missing.");
+      const eventContract = new ethers.Contract(address, EVENT_ABI, signer);
+      const tx = await eventContract.checkIn(tokenId);
+      await tx.wait();
+    },
+    onSuccess: (_, tokenId) => {
+      showSuccess(`Ticket #${tokenId} checked in successfully!`);
+      queryClient.invalidateQueries({ queryKey: ["attendees", address] });
+    },
+    onError: (error: Error) => showError(error.message || "Check-in failed."),
+  });
+
+  const handleCheckInToggle = (tokenId: string, isCheckedIn: boolean) => {
+    if (!isCheckedIn) { // Prevent un-checking in
+      checkInMutation.mutate(tokenId);
     }
-  }, [id]);
-
-  if (!event) {
-    return <NotFound />;
-  }
-
-  const handleCheckInToggle = (attendeeId: string, isCheckedIn: boolean) => {
-    setAttendees(prev =>
-      prev.map(att =>
-        att.id === attendeeId ? { ...att, isCheckedIn } : att
-      )
-    );
-    showSuccess(`Attendee ${isCheckedIn ? 'checked in' : 'marked as not attended'}.`);
   };
 
   const handleScanSuccess = (ticketId: string) => {
     showSuccess(`Successfully scanned ticket: ${ticketId}. Attendee checked in.`);
-    // In a real app, you'd find the attendee by ticketId and check them in.
     setTimeout(() => setIsScannerOpen(false), 1500);
   };
 
-  const checkedInCount = attendees.filter(a => a.isCheckedIn).length;
+  if (isEventLoading) return <div>Loading...</div>;
+  if (!event) return <NotFound />;
+
+  const checkedInCount = attendees?.filter(a => a.isCheckedIn).length || 0;
+  const totalAttendees = attendees?.length || 0;
 
   return (
     <>
       <motion.div
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        variants={pageTransition}
+        initial="initial" animate="animate" exit="exit" variants={pageTransition}
         className="min-h-screen text-white"
-        style={{
-          background: "linear-gradient(135deg, #2d5a3d 0%, #3d6b4a 100%)",
-        }}
+        style={{ background: "linear-gradient(135deg, #2d5a3d 0%, #3d6b4a 100%)" }}
       >
         <Header />
         <main className="container mx-auto px-6 py-10 pt-28 flex-grow">
           <div className="mb-8">
-            <Link
-              to="/dashboard"
-              className="inline-flex items-center text-sm font-medium text-white/60 hover:text-white transition-opacity"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+            <Link to="/dashboard" className="inline-flex items-center text-sm font-medium text-white/60 hover:text-white transition-opacity">
+              <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
             </Link>
           </div>
 
@@ -77,13 +122,8 @@ const ManageEvent = () => {
               <h1 className="text-4xl font-bold tracking-tight">{event.title}</h1>
               <p className="text-white/70 mt-1">Attendee Management</p>
             </div>
-            <Button
-              size="lg"
-              className="w-full md:w-auto bg-white text-green-900 font-bold hover:bg-gray-200"
-              onClick={() => setIsScannerOpen(true)}
-            >
-              <QrCode className="w-5 h-5 mr-2" />
-              Scan QR Code
+            <Button size="lg" className="w-full md:w-auto bg-white text-green-900 font-bold hover:bg-gray-200" onClick={() => setIsScannerOpen(true)}>
+              <QrCode className="w-5 h-5 mr-2" /> Scan QR Code
             </Button>
           </div>
 
@@ -91,7 +131,7 @@ const ManageEvent = () => {
             <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
               <div>
                 <p className="text-sm text-white/70">Total Attendees</p>
-                <p className="text-3xl font-bold">{attendees.length}</p>
+                <p className="text-3xl font-bold">{totalAttendees}</p>
               </div>
               <div>
                 <p className="text-sm text-white/70">Checked In</p>
@@ -100,43 +140,45 @@ const ManageEvent = () => {
               <div>
                 <p className="text-sm text-white/70">Attendance Rate</p>
                 <p className="text-3xl font-bold">
-                  {attendees.length > 0 ? ((checkedInCount / attendees.length) * 100).toFixed(0) : 0}%
+                  {totalAttendees > 0 ? ((checkedInCount / totalAttendees) * 100).toFixed(0) : 0}%
                 </p>
               </div>
             </CardContent>
           </Card>
 
           <div className="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl overflow-hidden">
-            <div className="p-4 border-b border-white/10">
-              <h2 className="font-semibold">Attendee List</h2>
-            </div>
-            <ul className="divide-y divide-white/10">
-              {attendees.map(attendee => (
-                <li key={attendee.id} className="p-4 flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">{attendee.name}</p>
-                    <p className="text-sm text-white/60">{attendee.email}</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-xs font-semibold ${attendee.isCheckedIn ? 'text-green-400' : 'text-white/60'}`}>
-                      {attendee.isCheckedIn ? 'Checked In' : 'Pending'}
-                    </span>
-                    <Switch
-                      checked={attendee.isCheckedIn}
-                      onCheckedChange={(checked) => handleCheckInToggle(attendee.id, checked)}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="p-4 border-b border-white/10"><h2 className="font-semibold">Attendee List</h2></div>
+            {areAttendeesLoading ? (
+              <div className="p-4 space-y-2">
+                <Skeleton className="h-8 w-full bg-white/10" />
+                <Skeleton className="h-8 w-full bg-white/10" />
+              </div>
+            ) : (
+              <ul className="divide-y divide-white/10">
+                {attendees?.map(attendee => (
+                  <li key={attendee.tokenId} className="p-4 flex justify-between items-center">
+                    <div>
+                      <p className="font-medium font-mono text-sm">{attendee.walletAddress}</p>
+                      <p className="text-xs text-white/60">Ticket ID: #{attendee.tokenId}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-xs font-semibold ${attendee.isCheckedIn ? 'text-green-400' : 'text-white/60'}`}>
+                        {attendee.isCheckedIn ? 'Checked In' : 'Pending'}
+                      </span>
+                      <Switch
+                        checked={attendee.isCheckedIn}
+                        onCheckedChange={() => handleCheckInToggle(attendee.tokenId, attendee.isCheckedIn)}
+                        disabled={attendee.isCheckedIn || checkInMutation.isPending}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </main>
       </motion.div>
-      <QRScannerModal
-        isOpen={isScannerOpen}
-        onClose={() => setIsScannerOpen(false)}
-        onScanSuccess={handleScanSuccess}
-      />
+      <QRScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScanSuccess={handleScanSuccess} />
     </>
   );
 };
