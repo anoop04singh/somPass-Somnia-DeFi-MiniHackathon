@@ -1,0 +1,54 @@
+type Event @entity {
+  "The event contract address"
+  id: Bytes!
+
+  "The organizer's wallet address"
+  organizer: Bytes!
+
+  "The IPFS hash for event details"
+  metadataCID: String!
+
+  "Price per ticket in Wei"
+  ticketPrice: BigInt!
+
+  "Maximum number of tickets available"
+  ticketSupply: BigInt!
+
+  "Counter for total tickets sold"
+  totalTicketsSold: BigInt!
+
+  "Timestamp of when the event was created"
+  createdAtTimestamp: BigInt!
+
+  "Block number of when the event was created"
+  createdAtBlockNumber: BigInt!
+
+  "A list of all tickets for this event"
+  tickets: [Ticket!] @derivedFrom(field: "event")
+}
+
+type Ticket @entity {
+  "A unique ID, formatted as: {eventAddress}-{tokenId}"
+  id: ID!
+
+  "The NFT token ID for this ticket"
+  tokenId: BigInt!
+
+  "The event this ticket belongs to"
+  event: Event!
+
+  "The current owner of the ticket"
+  owner: Bytes!
+
+  "Whether the ticket has been checked in at the event"
+  isCheckedIn: Boolean!
+
+  "Timestamp of when the ticket was minted"
+  mintedAtTimestamp: BigInt!
+
+  "Block number of when the ticket was minted"
+  mintedAtBlockNumber: BigInt!
+
+  "Timestamp of when the ticket was checked in (null if not checked in)"
+  checkInTimestamp: BigInt
+}

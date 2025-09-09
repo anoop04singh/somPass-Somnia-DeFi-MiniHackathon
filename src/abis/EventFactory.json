@@ -52,7 +52,7 @@
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "maxTickets",
+				"name": "ticketSupply",
 				"type": "uint256"
 			}
 		],
