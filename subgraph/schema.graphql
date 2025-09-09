@@ -1,4 +1,4 @@
-type Event @entity {
+type Event @entity(immutable: false) {
   "The event contract address as a hex string"
   id: ID!
 
@@ -27,7 +27,7 @@ type Event @entity {
   tickets: [Ticket!] @derivedFrom(field: "event")
 }
 
-type Ticket @entity {
+type Ticket @entity(immutable: false) {
   "A unique ID, formatted as: {eventAddress}-{tokenId}"
   id: ID!
 
