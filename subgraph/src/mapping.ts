@@ -11,14 +11,14 @@ import { Event as EventTemplate } from "../generated/templates";
 
 // Handles the EventCreated event from the EventFactory contract
 export function handleEventCreated(event: EventCreated): void {
-  // Use the raw address (Bytes) for the ID, not a hex string.
-  let eventEntity = new Event(event.params.eventContract);
+  // FIX: Use the hex string for the ID to make the entity mutable.
+  let eventId = event.params.eventContract.toHexString();
+  let eventEntity = new Event(eventId);
 
   // Populate the entity with data from the event
   eventEntity.organizer = event.params.organizer;
   eventEntity.metadataCID = event.params.metadataCID;
   eventEntity.ticketPrice = event.params.ticketPrice;
-  // FIX: Use the correct parameter name from the ABI.
   eventEntity.ticketSupply = event.params.ticketSupply;
   eventEntity.totalTicketsSold = BigInt.fromI32(0);
   eventEntity.createdAtTimestamp = event.block.timestamp;
@@ -37,22 +37,25 @@ export function handleTransfer(event: Transfer): void {
   let ticketId =
     event.address.toHexString() + "-" + event.params.tokenId.toString();
   
+  // FIX: Get the event's string ID.
+  let eventId = event.address.toHexString();
+
   // Check if this is a mint event (from the zero address)
   if (event.params.from == Address.zero()) {
     // This is a new ticket being bought/minted
     let ticket = new Ticket(ticketId);
     ticket.tokenId = event.params.tokenId;
     ticket.owner = event.params.to;
-    // The 'event' field expects the Event ID, which is the address in Bytes.
-    ticket.event = event.address;
+    // FIX: The 'event' field expects the Event's string ID.
+    ticket.event = eventId;
     ticket.isCheckedIn = false;
     ticket.mintedAtTimestamp = event.block.timestamp;
     ticket.mintedAtBlockNumber = event.block.number;
     ticket.save();
 
     // Update the totalTicketsSold count on the parent Event
-    // Load the event using its address (Bytes), not a hex string.
-    let eventEntity = Event.load(event.address);
+    // FIX: Load the event using its string ID.
+    let eventEntity = Event.load(eventId);
     if (eventEntity) {
       eventEntity.totalTicketsSold = eventEntity.totalTicketsSold.plus(
         BigInt.fromI32(1)

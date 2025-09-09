@@ -1,6 +1,6 @@
 type Event @entity {
-  "The event contract address"
-  id: Bytes!
+  "The event contract address as a hex string"
+  id: ID!
 
   "The organizer's wallet address"
   organizer: Bytes!
