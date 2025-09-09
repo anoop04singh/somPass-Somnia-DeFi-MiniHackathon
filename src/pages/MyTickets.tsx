@@ -29,9 +29,28 @@ const fetchMyTickets = async (account: string | null): Promise<Ticket[]> => {
 
   for (const address of eventAddresses) {
     const eventContract = new ethers.Contract(address, EVENT_ABI, provider);
+    
+    // First, do a cheap check to see if the user has any tickets for this event.
     const balance = await eventContract.balanceOf(account);
+    if (Number(balance) === 0) {
+      continue; // Skip if the user has no tickets for this event.
+    }
 
-    if (Number(balance) > 0) {
+    // Find all tokens transferred TO the user
+    const receivedFilter = eventContract.filters.Transfer(null, account);
+    const receivedLogs = await eventContract.queryFilter(receivedFilter);
+    const receivedTokenIds = new Set(receivedLogs.map(log => log.args.tokenId.toString()));
+
+    // Find all tokens transferred FROM the user
+    const sentFilter = eventContract.filters.Transfer(account);
+    const sentLogs = await eventContract.queryFilter(sentFilter);
+    const sentTokenIds = new Set(sentLogs.map(log => log.args.tokenId.toString()));
+
+    // The tokens the user currently owns are those they received but have not sent away.
+    const ownedTokenIds = [...receivedTokenIds].filter(id => !sentTokenIds.has(id));
+
+    if (ownedTokenIds.length > 0) {
+      // Fetch event details only once if tickets are owned.
       const [metadataCID, ticketPrice, ticketSupply, attendees, organizerAddress] = await Promise.all([
         eventContract.metadataCID(),
         eventContract.ticketPrice(),
@@ -53,14 +72,13 @@ const fetchMyTickets = async (account: string | null): Promise<Ticket[]> => {
         organizerAddress,
       };
 
-      for (let i = 0; i < Number(balance); i++) {
-        const tokenId = await eventContract.tokenOfOwnerByIndex(account, i);
+      ownedTokenIds.forEach(id => {
         allTickets.push({
-          id: tokenId.toString(),
+          id: id,
           event: eventDetails,
           eventId: address,
         });
-      }
+      });
     }
   }
   return allTickets;
