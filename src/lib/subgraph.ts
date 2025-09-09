@@ -2,7 +2,7 @@ import { Event, EventMetadata } from "@/data/events";
 import { getIPFSUrl } from "./ipfs";
 import { ethers } from "ethers";
 
-const SUBGRAPH_URL = "https://api.subgraph.somnia.network/api/public/2fa4ad73-dae8-47a2-8b88-5e758e66eb86/subgraphs/eventfactory2/0.1/gn";
+const SUBGRAPH_URL = "https://api.subgraph.somnia.network/api/public/2fa4ad73-dae8-47a2-8b88-5e758e66eb86/subgraphs/eventfactory2/0.2/gn";
 
 export const querySubgraph = async <T>(query: string, variables?: Record<string, any>): Promise<T> => {
   const response = await fetch(SUBGRAPH_URL, {
