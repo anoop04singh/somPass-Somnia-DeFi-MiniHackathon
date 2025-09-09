@@ -1,6 +1,5 @@
 import { Header } from "@/components/Header";
 import { TicketCard } from "@/components/TicketCard";
-import { mockUserTickets } from "@/data/tickets";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Ticket } from "lucide-react";
@@ -10,8 +9,11 @@ import {
   containerVariants,
   itemVariants,
 } from "@/lib/animations";
+import { useTicketStore } from "@/store/ticketStore";
 
 const MyTickets = () => {
+  const tickets = useTicketStore((state) => state.tickets);
+
   return (
     <motion.div
       initial="initial"
@@ -33,14 +35,14 @@ const MyTickets = () => {
         >
           My Tickets
         </motion.h1>
-        {mockUserTickets.length > 0 ? (
+        {tickets.length > 0 ? (
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
             className="space-y-6"
           >
-            {mockUserTickets.map((ticket) => (
+            {tickets.map((ticket) => (
               <motion.div key={ticket.id} variants={itemVariants}>
                 <TicketCard ticket={ticket} />
               </motion.div>

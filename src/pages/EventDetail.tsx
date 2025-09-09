@@ -1,5 +1,4 @@
 import { useParams, Link } from "react-router-dom";
-import { mockEvents } from "@/data/events";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,17 +14,21 @@ import { showSuccess } from "@/utils/toast";
 import NotFound from "./NotFound";
 import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
+import { useEventStore } from "@/store/eventStore";
+import { useTicketStore } from "@/store/ticketStore";
 
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const event = mockEvents.find((e) => e.id === id);
+  const event = useEventStore((state) => state.events.find((e) => e.id === id));
+  const addTicket = useTicketStore((state) => state.addTicket);
 
   if (!event) {
     return <NotFound />;
   }
 
   const handleBuyTicket = () => {
-    showSuccess("Ticket purchased successfully! (Simulation)");
+    addTicket(event);
+    showSuccess("Ticket purchased successfully!");
   };
 
   return (

@@ -13,13 +13,22 @@ import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
 import { useAlertStore } from "@/hooks/use-alert";
 import { useNavigate } from "react-router-dom";
+import { useEventStore } from "@/store/eventStore";
 
 const CreateEvent = () => {
   const [eventName, setEventName] = useState("Event Name");
   const [isEditingName, setIsEditingName] = useState(false);
   const [requireApproval, setRequireApproval] = useState(true);
+  const [location, setLocation] = useState("");
+  const [description, setDescription] = useState("");
+  const [startDate, setStartDate] = useState("2024-09-02");
+  const [startTime, setStartTime] = useState("00:00");
+  const [endDate, setEndDate] = useState("2024-09-02");
+  const [endTime, setEndTime] = useState("01:00");
+
   const showConfirmation = useAlertStore((state) => state.showConfirmation);
   const navigate = useNavigate();
+  const addEvent = useEventStore((state) => state.addEvent);
 
   const handleNameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setEventName(e.target.value || "Event Name");
@@ -34,7 +43,23 @@ const CreateEvent = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    showSuccess("Event created successfully! (Simulation)");
+    const eventDate = new Date(startDate).toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+    });
+
+    addEvent({
+      title: eventName,
+      date: eventDate,
+      startTime: startTime,
+      endTime: endTime,
+      location: location || "Online",
+      description: description || "No description provided.",
+    });
+
+    showSuccess("Event created successfully!");
+    navigate("/");
   };
 
   const handleCancel = () => {
@@ -122,12 +147,14 @@ const CreateEvent = () => {
                   <Input
                     type="date"
                     className="bg-white/10 border-white/20"
-                    defaultValue="2024-09-02"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
                   />
                   <Input
                     type="time"
                     className="bg-white/10 border-white/20"
-                    defaultValue="00:00"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
                   />
                 </div>
                 <div className="flex items-center gap-4 text-sm">
@@ -136,12 +163,14 @@ const CreateEvent = () => {
                   <Input
                     type="date"
                     className="bg-white/10 border-white/20"
-                    defaultValue="2024-09-02"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
                   />
                   <Input
                     type="time"
                     className="bg-white/10 border-white/20"
-                    defaultValue="01:00"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
                   />
                 </div>
               </div>
@@ -151,6 +180,8 @@ const CreateEvent = () => {
                   type="text"
                   placeholder="📍 Add Event Location"
                   className="bg-white/10 border-white/20 placeholder:text-white/60 h-12"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
                 />
                 <p className="text-sm text-white/60 mt-1">
                   Offline location or virtual link
@@ -160,6 +191,8 @@ const CreateEvent = () => {
               <Textarea
                 placeholder="📝 Add Description"
                 className="bg-white/10 border-white/20 placeholder:text-white/60 min-h-[100px]"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
 
               <Card className="bg-transparent border-y border-white/10 rounded-none shadow-none">

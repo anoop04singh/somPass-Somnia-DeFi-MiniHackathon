@@ -1,6 +1,5 @@
 import { Header } from "@/components/Header";
 import { EventCard } from "@/components/EventCard";
-import { mockEvents } from "@/data/events";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -8,8 +7,11 @@ import {
   containerVariants,
   itemVariants,
 } from "@/lib/animations";
+import { useEventStore } from "@/store/eventStore";
 
 const Index = () => {
+  const events = useEventStore((state) => state.events);
+
   return (
     <motion.div
       initial="initial"
@@ -37,7 +39,7 @@ const Index = () => {
           animate="visible"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10"
         >
-          {mockEvents.map((event) => (
+          {events.map((event) => (
             <motion.div key={event.id} variants={itemVariants}>
               <Link to={`/event/${event.id}`}>
                 <EventCard event={event} />
