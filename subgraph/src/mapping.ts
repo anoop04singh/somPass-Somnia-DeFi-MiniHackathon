@@ -11,16 +11,15 @@ import { Event as EventTemplate } from "../generated/templates";
 
 // Handles the EventCreated event from the EventFactory contract
 export function handleEventCreated(event: EventCreated): void {
-  // FIX: Use the raw address (Bytes) for the ID, not a hex string.
+  // Use the raw address (Bytes) for the ID, not a hex string.
   let eventEntity = new Event(event.params.eventContract);
 
   // Populate the entity with data from the event
   eventEntity.organizer = event.params.organizer;
   eventEntity.metadataCID = event.params.metadataCID;
   eventEntity.ticketPrice = event.params.ticketPrice;
-  // FIX: The codegen likely used the function argument name `_maxTickets` for this parameter.
-  eventEntity.ticketSupply = event.params._maxTickets;
-  // FIX: Use BigInt imported from graph-ts.
+  // FIX: Use the correct parameter name from the ABI.
+  eventEntity.ticketSupply = event.params.ticketSupply;
   eventEntity.totalTicketsSold = BigInt.fromI32(0);
   eventEntity.createdAtTimestamp = event.block.timestamp;
   eventEntity.createdAtBlockNumber = event.block.number;
@@ -44,7 +43,7 @@ export function handleTransfer(event: Transfer): void {
     let ticket = new Ticket(ticketId);
     ticket.tokenId = event.params.tokenId;
     ticket.owner = event.params.to;
-    // FIX: The 'event' field expects the Event ID, which is the address in Bytes.
+    // The 'event' field expects the Event ID, which is the address in Bytes.
     ticket.event = event.address;
     ticket.isCheckedIn = false;
     ticket.mintedAtTimestamp = event.block.timestamp;
@@ -52,11 +51,10 @@ export function handleTransfer(event: Transfer): void {
     ticket.save();
 
     // Update the totalTicketsSold count on the parent Event
-    // FIX: Load the event using its address (Bytes), not a hex string.
+    // Load the event using its address (Bytes), not a hex string.
     let eventEntity = Event.load(event.address);
     if (eventEntity) {
       eventEntity.totalTicketsSold = eventEntity.totalTicketsSold.plus(
-        // FIX: Use BigInt imported from graph-ts.
         BigInt.fromI32(1)
       );
       eventEntity.save();
