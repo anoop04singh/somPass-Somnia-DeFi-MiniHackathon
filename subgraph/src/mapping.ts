@@ -1,3 +1,4 @@
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   EventCreated,
 } from "../generated/EventFactory/EventFactory";
@@ -7,19 +8,20 @@ import {
 } from "../generated/templates/Event/Event";
 import { Event, Ticket } from "../generated/schema";
 import { Event as EventTemplate } from "../generated/templates";
-import { Address } from "@graphprotocol/graph-ts";
 
 // Handles the EventCreated event from the EventFactory contract
 export function handleEventCreated(event: EventCreated): void {
-  // Create a new Event entity using the contract address as the ID
-  let eventEntity = new Event(event.params.eventContract.toHexString());
+  // FIX: Use the raw address (Bytes) for the ID, not a hex string.
+  let eventEntity = new Event(event.params.eventContract);
 
   // Populate the entity with data from the event
   eventEntity.organizer = event.params.organizer;
   eventEntity.metadataCID = event.params.metadataCID;
   eventEntity.ticketPrice = event.params.ticketPrice;
-  eventEntity.ticketSupply = event.params.ticketSupply;
-  eventEntity.totalTicketsSold = BigInt.fromI32(0); // Initialize sold count
+  // FIX: The codegen likely used the function argument name `_maxTickets` for this parameter.
+  eventEntity.ticketSupply = event.params._maxTickets;
+  // FIX: Use BigInt imported from graph-ts.
+  eventEntity.totalTicketsSold = BigInt.fromI32(0);
   eventEntity.createdAtTimestamp = event.block.timestamp;
   eventEntity.createdAtBlockNumber = event.block.number;
 
@@ -42,16 +44,19 @@ export function handleTransfer(event: Transfer): void {
     let ticket = new Ticket(ticketId);
     ticket.tokenId = event.params.tokenId;
     ticket.owner = event.params.to;
-    ticket.event = event.address.toHexString();
+    // FIX: The 'event' field expects the Event ID, which is the address in Bytes.
+    ticket.event = event.address;
     ticket.isCheckedIn = false;
     ticket.mintedAtTimestamp = event.block.timestamp;
     ticket.mintedAtBlockNumber = event.block.number;
     ticket.save();
 
     // Update the totalTicketsSold count on the parent Event
-    let eventEntity = Event.load(event.address.toHexString());
+    // FIX: Load the event using its address (Bytes), not a hex string.
+    let eventEntity = Event.load(event.address);
     if (eventEntity) {
       eventEntity.totalTicketsSold = eventEntity.totalTicketsSold.plus(
+        // FIX: Use BigInt imported from graph-ts.
         BigInt.fromI32(1)
       );
       eventEntity.save();
