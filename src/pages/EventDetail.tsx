@@ -18,37 +18,30 @@ import { useQuery } from "@tanstack/react-query";
 import { ethers } from "ethers";
 import { EVENT_ABI } from "@/lib/constants";
 import { Event } from "@/data/events";
-import { getIPFSUrl } from "@/lib/ipfs";
 import { useWeb3Store } from "@/store/web3Store";
 import { Skeleton } from "@/components/ui/skeleton";
+import { querySubgraph, mapSubgraphEventToEvent, SubgraphEvent } from "@/lib/subgraph";
 
 const fetchEventDetail = async (address: string): Promise<Event | null> => {
-  if (!window.ethereum || !address) return null;
+  if (!address) return null;
+  const query = `
+    query GetEvent($id: ID!) {
+      event(id: $id) {
+        id
+        metadataCID
+        organizer
+        ticketPrice
+        ticketSupply
+        totalTicketsSold
+      }
+    }
+  `;
   try {
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const eventContract = new ethers.Contract(address, EVENT_ABI, provider);
-    const [metadataCID, ticketPrice, ticketSupply, attendees, organizerAddress] = await Promise.all([
-      eventContract.metadataCID(),
-      eventContract.ticketPrice(),
-      eventContract.maxTickets(),
-      eventContract.totalTicketsSold(),
-      eventContract.owner(),
-    ]);
-
-    const metadataUrl = getIPFSUrl(metadataCID);
-    const metadataResponse = await fetch(metadataUrl);
-    const metadata = await metadataResponse.json();
-
-    return {
-      ...metadata,
-      contractAddress: address,
-      ticketPrice: Number(ethers.formatEther(ticketPrice)),
-      ticketSupply: Number(ticketSupply),
-      attendees: Number(attendees),
-      organizerAddress,
-    };
+    const response = await querySubgraph<{ event: SubgraphEvent | null }>(query, { id: address.toLowerCase() });
+    if (!response.event) return null;
+    return await mapSubgraphEventToEvent(response.event);
   } catch (error) {
-    console.error("Failed to fetch event details:", error);
+    console.error("Failed to fetch event details from subgraph:", error);
     return null;
   }
 };

@@ -4,55 +4,35 @@ import { pageTransition, containerVariants, itemVariants } from "@/lib/animation
 import { DashboardEventCard } from "@/components/DashboardEventCard";
 import { useWeb3Store } from "@/store/web3Store";
 import { useQuery } from "@tanstack/react-query";
-import { ethers } from "ethers";
-import { EVENT_FACTORY_ADDRESS, EVENT_FACTORY_ABI, EVENT_ABI } from "@/lib/constants";
 import { Event } from "@/data/events";
-import { getIPFSUrl } from "@/lib/ipfs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { querySubgraph, mapSubgraphEventToEvent, SubgraphEvent } from "@/lib/subgraph";
 
-const fetchEvents = async (): Promise<Event[]> => {
-  if (!window.ethereum) return [];
-  const provider = new ethers.BrowserProvider(window.ethereum);
-  const factoryContract = new ethers.Contract(EVENT_FACTORY_ADDRESS, EVENT_FACTORY_ABI, provider);
-  const eventAddresses = await factoryContract.getAllEvents();
-
-  const eventsPromises = eventAddresses.map(async (address: string) => {
-    const eventContract = new ethers.Contract(address, EVENT_ABI, provider);
-    const [metadataCID, ticketPrice, ticketSupply, attendees, organizerAddress] = await Promise.all([
-      eventContract.metadataCID(),
-      eventContract.ticketPrice(),
-      eventContract.maxTickets(),
-      eventContract.totalTicketsSold(),
-      eventContract.owner(),
-    ]);
-
-    const metadataUrl = getIPFSUrl(metadataCID);
-    const metadataResponse = await fetch(metadataUrl);
-    const metadata = await metadataResponse.json();
-
-    return {
-      ...metadata,
-      contractAddress: address,
-      ticketPrice: Number(ethers.formatEther(ticketPrice)),
-      ticketSupply: Number(ticketSupply),
-      attendees: Number(attendees),
-      organizerAddress,
-    };
-  });
-
-  return Promise.all(eventsPromises);
+const fetchOrganizerEvents = async (account: string | null): Promise<Event[]> => {
+  if (!account) return [];
+  const query = `
+    query GetOrganizerEvents($organizer: Bytes!) {
+      events(where: { organizer: $organizer }, orderBy: createdAtTimestamp, orderDirection: desc) {
+        id
+        metadataCID
+        organizer
+        ticketPrice
+        ticketSupply
+        totalTicketsSold
+      }
+    }
+  `;
+  const response = await querySubgraph<{ events: SubgraphEvent[] }>(query, { organizer: account.toLowerCase() });
+  return Promise.all(response.events.map(mapSubgraphEventToEvent));
 };
 
 const Dashboard = () => {
   const { account, isConnected } = useWeb3Store();
-  const { data: allEvents, isLoading } = useQuery({
-    queryKey: ["events"],
-    queryFn: fetchEvents,
+  const { data: organizerEvents, isLoading } = useQuery({
+    queryKey: ["organizerEvents", account],
+    queryFn: () => fetchOrganizerEvents(account),
+    enabled: isConnected && !!account,
   });
-
-  const organizerEvents = allEvents?.filter(
-    (event) => event.organizerAddress.toLowerCase() === account?.toLowerCase()
-  );
 
   return (
     <motion.div

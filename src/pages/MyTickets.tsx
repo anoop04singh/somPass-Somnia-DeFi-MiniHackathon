@@ -11,77 +11,48 @@ import {
 } from "@/lib/animations";
 import { useWeb3Store } from "@/store/web3Store";
 import { useQuery } from "@tanstack/react-query";
-import { ethers } from "ethers";
-import { EVENT_FACTORY_ADDRESS, EVENT_FACTORY_ABI, EVENT_ABI } from "@/lib/constants";
 import { Ticket } from "@/data/tickets";
-import { Event } from "@/data/events";
-import { getIPFSUrl } from "@/lib/ipfs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { querySubgraph, mapSubgraphEventToEvent, SubgraphEvent } from "@/lib/subgraph";
+
+interface SubgraphTicket {
+  id: string;
+  tokenId: string;
+  owner: string;
+  event: SubgraphEvent;
+}
 
 const fetchMyTickets = async (account: string | null): Promise<Ticket[]> => {
-  if (!window.ethereum || !account) return [];
-
-  const provider = new ethers.BrowserProvider(window.ethereum);
-  const factoryContract = new ethers.Contract(EVENT_FACTORY_ADDRESS, EVENT_FACTORY_ABI, provider);
-  const eventAddresses: string[] = await factoryContract.getAllEvents();
-
-  const allTickets: Ticket[] = [];
-
-  for (const address of eventAddresses) {
-    const eventContract = new ethers.Contract(address, EVENT_ABI, provider);
-    
-    // First, do a cheap check to see if the user has any tickets for this event.
-    const balance = await eventContract.balanceOf(account);
-    if (Number(balance) === 0) {
-      continue; // Skip if the user has no tickets for this event.
+  if (!account) return [];
+  const query = `
+    query GetMyTickets($owner: Bytes!) {
+      tickets(where: { owner: $owner }) {
+        id
+        tokenId
+        owner
+        event {
+          id
+          metadataCID
+          organizer
+          ticketPrice
+          ticketSupply
+          totalTicketsSold
+        }
+      }
     }
+  `;
+  const response = await querySubgraph<{ tickets: SubgraphTicket[] }>(query, { owner: account.toLowerCase() });
+  
+  const tickets = await Promise.all(response.tickets.map(async (subgraphTicket) => {
+    const event = await mapSubgraphEventToEvent(subgraphTicket.event);
+    return {
+      id: subgraphTicket.tokenId,
+      event: event,
+      eventId: event.contractAddress,
+    };
+  }));
 
-    // Find all tokens transferred TO the user
-    const receivedFilter = eventContract.filters.Transfer(null, account);
-    const receivedLogs = await eventContract.queryFilter(receivedFilter);
-    const receivedTokenIds = new Set(receivedLogs.map(log => log.args.tokenId.toString()));
-
-    // Find all tokens transferred FROM the user
-    const sentFilter = eventContract.filters.Transfer(account);
-    const sentLogs = await eventContract.queryFilter(sentFilter);
-    const sentTokenIds = new Set(sentLogs.map(log => log.args.tokenId.toString()));
-
-    // The tokens the user currently owns are those they received but have not sent away.
-    const ownedTokenIds = [...receivedTokenIds].filter(id => !sentTokenIds.has(id));
-
-    if (ownedTokenIds.length > 0) {
-      // Fetch event details only once if tickets are owned.
-      const [metadataCID, ticketPrice, ticketSupply, attendees, organizerAddress] = await Promise.all([
-        eventContract.metadataCID(),
-        eventContract.ticketPrice(),
-        eventContract.maxTickets(),
-        eventContract.totalTicketsSold(),
-        eventContract.owner(),
-      ]);
-
-      const metadataUrl = getIPFSUrl(metadataCID);
-      const metadataResponse = await fetch(metadataUrl);
-      const metadata = await metadataResponse.json();
-
-      const eventDetails: Event = {
-        ...metadata,
-        contractAddress: address,
-        ticketPrice: Number(ethers.formatEther(ticketPrice)),
-        ticketSupply: Number(ticketSupply),
-        attendees: Number(attendees),
-        organizerAddress,
-      };
-
-      ownedTokenIds.forEach(id => {
-        allTickets.push({
-          id: id,
-          event: eventDetails,
-          eventId: address,
-        });
-      });
-    }
-  }
-  return allTickets;
+  return tickets;
 };
 
 const MyTickets = () => {

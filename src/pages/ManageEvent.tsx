@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, QrCode } from "lucide-react";
 import { Event } from "@/data/events";
 import { Attendee } from "@/data/attendees";
-import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
+import { showSuccess, showError } from "@/utils/toast";
 import NotFound from "./NotFound";
 import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
@@ -14,49 +14,63 @@ import { QRScannerModal } from "@/components/QRScannerModal";
 import { Switch } from "@/components/ui/switch";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ethers } from "ethers";
-import { EVENT_ABI, EVENT_FACTORY_ABI, EVENT_FACTORY_ADDRESS } from "@/lib/constants";
-import { getIPFSUrl } from "@/lib/ipfs";
+import { EVENT_ABI } from "@/lib/constants";
 import { useWeb3Store } from "@/store/web3Store";
 import { Skeleton } from "@/components/ui/skeleton";
+import { querySubgraph, mapSubgraphEventToEvent, SubgraphEvent } from "@/lib/subgraph";
+
+interface SubgraphAttendee {
+  tokenId: string;
+  owner: string;
+  isCheckedIn: boolean;
+}
 
 const fetchEventDetail = async (address: string): Promise<Event | null> => {
-  if (!window.ethereum || !address) return null;
-  const provider = new ethers.BrowserProvider(window.ethereum);
-  const eventContract = new ethers.Contract(address, EVENT_ABI, provider);
-  const [metadataCID, ticketPrice, ticketSupply, attendees, organizerAddress] = await Promise.all([
-    eventContract.metadataCID(), eventContract.ticketPrice(), eventContract.maxTickets(),
-    eventContract.totalTicketsSold(), eventContract.owner(),
-  ]);
-  const metadata = await (await fetch(getIPFSUrl(metadataCID))).json();
-  return {
-    ...metadata, contractAddress: address, ticketPrice: Number(ethers.formatEther(ticketPrice)),
-    ticketSupply: Number(ticketSupply), attendees: Number(attendees), organizerAddress,
-  };
+  if (!address) return null;
+  const query = `
+    query GetEvent($id: ID!) {
+      event(id: $id) {
+        id
+        metadataCID
+        organizer
+        ticketPrice
+        ticketSupply
+        totalTicketsSold
+      }
+    }
+  `;
+  try {
+    const response = await querySubgraph<{ event: SubgraphEvent | null }>(query, { id: address.toLowerCase() });
+    if (!response.event) return null;
+    return await mapSubgraphEventToEvent(response.event);
+  } catch (error) {
+    console.error("Failed to fetch event details from subgraph:", error);
+    return null;
+  }
 };
 
-const fetchAttendees = async (address: string, provider: ethers.Provider): Promise<Attendee[]> => {
-  const eventContract = new ethers.Contract(address, EVENT_ABI, provider);
-  const totalSold = await eventContract.totalTicketsSold();
-  const attendeePromises: Promise<Attendee>[] = [];
-  for (let i = 0; i < Number(totalSold); i++) {
-    attendeePromises.push(
-      (async () => {
-        const tokenId = i;
-        const [walletAddress, isCheckedIn] = await Promise.all([
-          eventContract.ownerOf(tokenId),
-          eventContract.hasAttended(tokenId),
-        ]);
-        return { tokenId: tokenId.toString(), walletAddress, isCheckedIn };
-      })()
-    );
-  }
-  return Promise.all(attendeePromises);
+const fetchAttendees = async (address: string): Promise<Attendee[]> => {
+  const query = `
+    query GetAttendees($eventId: String!) {
+      tickets(where: { event: $eventId }, orderBy: tokenId, orderDirection: asc) {
+        tokenId
+        owner
+        isCheckedIn
+      }
+    }
+  `;
+  const response = await querySubgraph<{ tickets: SubgraphAttendee[] }>(query, { eventId: address.toLowerCase() });
+  return response.tickets.map(t => ({
+    tokenId: t.tokenId,
+    walletAddress: t.owner,
+    isCheckedIn: t.isCheckedIn,
+  }));
 };
 
 const ManageEvent = () => {
   const { address } = useParams<{ address: string }>();
   const [isScannerOpen, setIsScannerOpen] = useState(false);
-  const { provider, signer } = useWeb3Store();
+  const { signer } = useWeb3Store();
   const queryClient = useQueryClient();
 
   const { data: event, isLoading: isEventLoading } = useQuery({
@@ -67,8 +81,8 @@ const ManageEvent = () => {
 
   const { data: attendees, isLoading: areAttendeesLoading } = useQuery({
     queryKey: ["attendees", address],
-    queryFn: () => fetchAttendees(address!, provider!),
-    enabled: !!provider && !!address,
+    queryFn: () => fetchAttendees(address!),
+    enabled: !!address,
   });
 
   const checkInMutation = useMutation({

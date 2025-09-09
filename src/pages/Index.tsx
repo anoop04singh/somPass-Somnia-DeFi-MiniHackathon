@@ -8,46 +8,25 @@ import {
   itemVariants,
 } from "@/lib/animations";
 import { useQuery } from "@tanstack/react-query";
-import { ethers } from "ethers";
-import { EVENT_FACTORY_ADDRESS, EVENT_FACTORY_ABI, EVENT_ABI } from "@/lib/constants";
 import { Event } from "@/data/events";
-import { getIPFSUrl } from "@/lib/ipfs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { querySubgraph, mapSubgraphEventToEvent, SubgraphEvent } from "@/lib/subgraph";
 
 const fetchEvents = async (): Promise<Event[]> => {
-  if (!window.ethereum) {
-    console.error("MetaMask is not installed");
-    return [];
-  }
-  const provider = new ethers.BrowserProvider(window.ethereum);
-  const factoryContract = new ethers.Contract(EVENT_FACTORY_ADDRESS, EVENT_FACTORY_ABI, provider);
-  const eventAddresses = await factoryContract.getAllEvents();
-
-  const eventsPromises = eventAddresses.map(async (address: string) => {
-    const eventContract = new ethers.Contract(address, EVENT_ABI, provider);
-    const [metadataCID, ticketPrice, ticketSupply, attendees, organizerAddress] = await Promise.all([
-      eventContract.metadataCID(),
-      eventContract.ticketPrice(),
-      eventContract.maxTickets(),
-      eventContract.totalTicketsSold(),
-      eventContract.owner(),
-    ]);
-
-    const metadataUrl = getIPFSUrl(metadataCID);
-    const metadataResponse = await fetch(metadataUrl);
-    const metadata = await metadataResponse.json();
-
-    return {
-      ...metadata,
-      contractAddress: address,
-      ticketPrice: Number(ethers.formatEther(ticketPrice)),
-      ticketSupply: Number(ticketSupply),
-      attendees: Number(attendees),
-      organizerAddress,
-    };
-  });
-
-  return Promise.all(eventsPromises);
+  const query = `
+    query GetEvents {
+      events(orderBy: createdAtTimestamp, orderDirection: desc) {
+        id
+        metadataCID
+        organizer
+        ticketPrice
+        ticketSupply
+        totalTicketsSold
+      }
+    }
+  `;
+  const response = await querySubgraph<{ events: SubgraphEvent[] }>(query);
+  return Promise.all(response.events.map(mapSubgraphEventToEvent));
 };
 
 const Index = () => {
