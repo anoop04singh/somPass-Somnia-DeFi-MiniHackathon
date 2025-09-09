@@ -8,69 +8,77 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
-import { showSuccess } from "@/utils/toast";
+import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
 import { useAlertStore } from "@/hooks/use-alert";
 import { useNavigate } from "react-router-dom";
-import { useEventStore } from "@/store/eventStore";
+import { useWeb3Store } from "@/store/web3Store";
+import { uploadToIPFS } from "@/lib/ipfs";
+import { ethers } from "ethers";
+import { EVENT_FACTORY_ADDRESS, EVENT_FACTORY_ABI } from "@/lib/constants";
 
 const CreateEvent = () => {
-  const [eventName, setEventName] = useState("Event Name");
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [requireApproval, setRequireApproval] = useState(true);
+  const [eventName, setEventName] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
-  const [startDate, setStartDate] = useState("2024-09-02");
-  const [startTime, setStartTime] = useState("00:00");
-  const [endDate, setEndDate] = useState("2024-09-02");
-  const [endTime, setEndTime] = useState("01:00");
+  const [startDate, setStartDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [ticketPrice, setTicketPrice] = useState(0);
+  const [ticketSupply, setTicketSupply] = useState(100);
 
   const showConfirmation = useAlertStore((state) => state.showConfirmation);
   const navigate = useNavigate();
-  const addEvent = useEventStore((state) => state.addEvent);
+  const { signer, isConnected, connectWallet } = useWeb3Store();
 
-  const handleNameBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    setEventName(e.target.value || "Event Name");
-    setIsEditingName(false);
-  };
-
-  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.currentTarget.blur();
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const eventDate = new Date(startDate).toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "short",
-      day: "numeric",
-    });
+    if (!isConnected || !signer) {
+      showError("Please connect your wallet to create an event.");
+      await connectWallet();
+      return;
+    }
 
-    addEvent({
-      title: eventName,
-      date: eventDate,
-      startTime: startTime,
-      endTime: endTime,
-      location: location || "Online",
-      description: description || "No description provided.",
-    });
+    const toastId = showLoading("Uploading event details to IPFS...");
+    try {
+      const metadataCID = await uploadToIPFS({
+        title: eventName,
+        date: new Date(startDate).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }),
+        startTime,
+        endTime,
+        location,
+        locationDetail: "Details to be added",
+        description,
+        organizers: [{ name: "My Organization", logoUrl: "" }],
+      });
+      
+      dismissToast(toastId);
+      const creationToastId = showLoading("Waiting for transaction confirmation...");
 
-    showSuccess("Event created successfully!");
-    navigate("/");
+      const factoryContract = new ethers.Contract(EVENT_FACTORY_ADDRESS, EVENT_FACTORY_ABI, signer);
+      const priceInWei = ethers.parseEther(ticketPrice.toString());
+      const tx = await factoryContract.createEvent(metadataCID, priceInWei, ticketSupply);
+      await tx.wait();
+
+      dismissToast(creationToastId);
+      showSuccess("Event created successfully!");
+      navigate("/");
+
+    } catch (error) {
+      dismissToast(toastId);
+      showError("Failed to create event. Please try again.");
+      console.error(error);
+    }
   };
 
   const handleCancel = () => {
     showConfirmation({
       title: "Are you sure?",
-      description:
-        "Any unsaved changes will be lost. Are you sure you want to cancel creating this event?",
+      description: "Any unsaved changes will be lost.",
       confirmText: "Yes, Cancel",
-      onConfirm: () => {
-        navigate("/");
-      },
+      onConfirm: () => navigate("/"),
     });
   };
 
@@ -90,13 +98,6 @@ const CreateEvent = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
           <div className="space-y-4 sticky top-28">
             <div className="relative aspect-[4/3] bg-black/20 rounded-xl flex items-center justify-center overflow-hidden">
-              <div
-                className="absolute inset-0"
-                style={{
-                  backgroundImage:
-                    "repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255, 255, 255, 0.05) 2px, rgba(255, 255, 255, 0.05) 20px)",
-                }}
-              ></div>
               <h2 className="text-3xl font-bold tracking-widest z-10 text-white/80">
                 EVENT IMAGE
               </h2>
@@ -121,23 +122,13 @@ const CreateEvent = () => {
               </div>
             </div>
 
-            {isEditingName ? (
-              <Input
-                type="text"
-                defaultValue={eventName}
-                onBlur={handleNameBlur}
-                onKeyDown={handleNameKeyDown}
-                autoFocus
-                className="text-5xl font-bold bg-transparent border-white/20 h-auto p-2 focus-visible:ring-white"
-              />
-            ) : (
-              <h1
-                onClick={() => setIsEditingName(true)}
-                className="text-5xl font-bold cursor-pointer min-h-[60px]"
-              >
-                {eventName}
-              </h1>
-            )}
+            <Input
+              type="text"
+              placeholder="Event Name"
+              value={eventName}
+              onChange={(e) => setEventName(e.target.value)}
+              className="text-5xl font-bold bg-transparent border-white/20 h-auto p-2 focus-visible:ring-white placeholder:text-white/40"
+            />
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
@@ -149,12 +140,14 @@ const CreateEvent = () => {
                     className="bg-white/10 border-white/20"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
+                    required
                   />
                   <Input
                     type="time"
                     className="bg-white/10 border-white/20"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
+                    required
                   />
                 </div>
                 <div className="flex items-center gap-4 text-sm">
@@ -165,12 +158,14 @@ const CreateEvent = () => {
                     className="bg-white/10 border-white/20"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
+                    required
                   />
                   <Input
                     type="time"
                     className="bg-white/10 border-white/20"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
+                    required
                   />
                 </div>
               </div>
@@ -182,6 +177,7 @@ const CreateEvent = () => {
                   className="bg-white/10 border-white/20 placeholder:text-white/60 h-12"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
+                  required
                 />
                 <p className="text-sm text-white/60 mt-1">
                   Offline location or virtual link
@@ -193,27 +189,22 @@ const CreateEvent = () => {
                 className="bg-white/10 border-white/20 placeholder:text-white/60 min-h-[100px]"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                required
               />
 
               <Card className="bg-transparent border-y border-white/10 rounded-none shadow-none">
-                <h3 className="text-lg font-semibold mb-2 text-white/80 sr-only">
-                  Event Options
-                </h3>
                 <div className="flex items-center justify-between py-4">
                   <div className="flex items-center gap-3">
                     <Ticket size={20} className="text-white/60" />
-                    <span className="text-white/80">Tickets</span>
+                    <span className="text-white/80">Ticket Price (SOM)</span>
                   </div>
-                  <span className="text-white/60">Free 🔗</span>
-                </div>
-                <div className="flex items-center justify-between py-4 border-t border-white/10">
-                  <div className="flex items-center gap-3">
-                    <UserCheck size={20} className="text-white/60" />
-                    <span className="text-white/80">Require Approval</span>
-                  </div>
-                  <Switch
-                    checked={requireApproval}
-                    onCheckedChange={setRequireApproval}
+                  <Input
+                    type="number"
+                    className="bg-white/10 border-white/20 w-24"
+                    value={ticketPrice}
+                    onChange={(e) => setTicketPrice(parseFloat(e.target.value))}
+                    step="0.01"
+                    min="0"
                   />
                 </div>
                 <div className="flex items-center justify-between py-4 border-t border-white/10">
@@ -221,7 +212,13 @@ const CreateEvent = () => {
                     <Users size={20} className="text-white/60" />
                     <span className="text-white/80">Capacity</span>
                   </div>
-                  <span className="text-white/60">Unlimited 🔗</span>
+                  <Input
+                    type="number"
+                    className="bg-white/10 border-white/20 w-24"
+                    value={ticketSupply}
+                    onChange={(e) => setTicketSupply(parseInt(e.target.value))}
+                    min="1"
+                  />
                 </div>
               </Card>
 

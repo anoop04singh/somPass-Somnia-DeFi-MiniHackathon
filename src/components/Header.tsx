@@ -11,12 +11,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { showSuccess } from "@/utils/toast";
+import { showSuccess, showError } from "@/utils/toast";
 import { ProfileModal } from "./ProfileModal";
+import { useWeb3Store } from "@/store/web3Store";
 
 export const Header = () => {
   const location = useLocation();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const { connectWallet, disconnectWallet, isConnected, account } = useWeb3Store();
 
   const navItems = [
     { href: "/", label: "Discover" },
@@ -24,6 +26,15 @@ export const Header = () => {
     { href: "/my-tickets", label: "My Tickets" },
     { href: "/dashboard", label: "Dashboard" },
   ];
+
+  const handleWalletConnect = async () => {
+    try {
+      await connectWallet();
+      showSuccess("Wallet connected successfully!");
+    } catch (error) {
+      showError("Failed to connect wallet.");
+    }
+  };
 
   return (
     <>
@@ -69,64 +80,70 @@ export const Header = () => {
             >
               <Bell size={18} />
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-8 w-8 rounded-full p-0"
+            {isConnected ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full p-0"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-white text-green-900 font-bold">
+                        {account?.substring(2, 4).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-56 bg-black/50 backdrop-blur-lg border-white/20 text-white"
+                  align="end"
+                  forceMount
                 >
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-white text-green-900 font-bold">
-                      S
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-56 bg-black/50 backdrop-blur-lg border-white/20 text-white"
-                align="end"
-                forceMount
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">Connected</p>
+                      <p className="text-xs leading-none text-white/70 truncate">
+                        {account}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-white/20" />
+                  <DropdownMenuItem
+                    onSelect={() => setIsProfileModalOpen(true)}
+                    className="focus:bg-white/10 focus:text-white"
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => showSuccess("Settings page coming soon!")}
+                    className="focus:bg-white/10 focus:text-white"
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/20" />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      disconnectWallet();
+                      showSuccess("Logged out successfully!");
+                    }}
+                    className="focus:bg-white/10 focus:text-white"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                onClick={handleWalletConnect}
+                className="bg-white text-green-900 font-bold hover:bg-gray-200"
               >
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">Satoshi</p>
-                    <p className="text-xs leading-none text-white/70">
-                      satoshi@somnia.net
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-white/20" />
-                <DropdownMenuItem
-                  onSelect={() => setIsProfileModalOpen(true)}
-                  className="focus:bg-white/10 focus:text-white"
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => showSuccess("Connecting wallet...")}
-                  className="focus:bg-white/10 focus:text-white"
-                >
-                  <Wallet className="mr-2 h-4 w-4" />
-                  <span>Connect Wallet</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => showSuccess("Settings page coming soon!")}
-                  className="focus:bg-white/10 focus:text-white"
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/20" />
-                <DropdownMenuItem
-                  onClick={() => showSuccess("Logged out successfully!")}
-                  className="focus:bg-white/10 focus:text-white"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <Wallet className="mr-2 h-4 w-4" />
+                Connect Wallet
+              </Button>
+            )}
           </div>
         </div>
       </header>

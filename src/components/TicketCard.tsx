@@ -20,7 +20,7 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
         <div className="flex flex-col justify-between p-6 flex-grow">
           <div>
             <h2 className="text-xl font-semibold mb-2 text-white">
-              <Link to={`/event/${event.id}`} className="hover:underline">
+              <Link to={`/event/${event.contractAddress}`} className="hover:underline">
                 {event.title}
               </Link>
             </h2>
@@ -36,7 +36,7 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
             </div>
           </div>
           <div className="mt-4 text-xs text-white/60">
-            Purchased on: {ticket.purchaseDate}
+            Ticket ID: {ticket.id}
           </div>
         </div>
         <div className="flex items-center justify-center p-6 bg-white/5 border-t sm:border-t-0 sm:border-l border-white/10">

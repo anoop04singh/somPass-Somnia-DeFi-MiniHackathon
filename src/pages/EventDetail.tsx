@@ -10,26 +10,102 @@ import {
   Share2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { showSuccess } from "@/utils/toast";
+import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import NotFound from "./NotFound";
 import { motion } from "framer-motion";
 import { pageTransition } from "@/lib/animations";
-import { useEventStore } from "@/store/eventStore";
-import { useTicketStore } from "@/store/ticketStore";
+import { useQuery } from "@tanstack/react-query";
+import { ethers } from "ethers";
+import { EVENT_ABI } from "@/lib/constants";
+import { Event } from "@/data/events";
+import { getIPFSUrl } from "@/lib/ipfs";
+import { useWeb3Store } from "@/store/web3Store";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const fetchEventDetail = async (address: string): Promise<Event | null> => {
+  if (!window.ethereum || !address) return null;
+  try {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const eventContract = new ethers.Contract(address, EVENT_ABI, provider);
+    const [metadataCID, ticketPrice, ticketSupply, attendees, organizerAddress] = await Promise.all([
+      eventContract.metadataCID(),
+      eventContract.ticketPrice(),
+      eventContract.maxTickets(),
+      eventContract.totalTicketsSold(),
+      eventContract.owner(),
+    ]);
+
+    const metadataUrl = getIPFSUrl(metadataCID);
+    const metadataResponse = await fetch(metadataUrl);
+    const metadata = await metadataResponse.json();
+
+    return {
+      ...metadata,
+      contractAddress: address,
+      ticketPrice: Number(ethers.formatEther(ticketPrice)),
+      ticketSupply: Number(ticketSupply),
+      attendees: Number(attendees),
+      organizerAddress,
+    };
+  } catch (error) {
+    console.error("Failed to fetch event details:", error);
+    return null;
+  }
+};
 
 const EventDetail = () => {
-  const { id } = useParams<{ id: string }>();
-  const event = useEventStore((state) => state.events.find((e) => e.id === id));
-  const addTicket = useTicketStore((state) => state.addTicket);
+  const { address } = useParams<{ address: string }>();
+  const { signer, isConnected, connectWallet } = useWeb3Store();
 
-  if (!event) {
-    return <NotFound />;
+  const { data: event, isLoading, error } = useQuery({
+    queryKey: ["event", address],
+    queryFn: () => fetchEventDetail(address!),
+    enabled: !!address,
+  });
+
+  const handleBuyTicket = async () => {
+    if (!isConnected || !signer || !address) {
+      showError("Please connect your wallet first.");
+      await connectWallet();
+      return;
+    }
+    if (!event) return;
+
+    const toastId = showLoading("Processing transaction...");
+    try {
+      const eventContract = new ethers.Contract(address, EVENT_ABI, signer);
+      const price = ethers.parseEther(event.ticketPrice.toString());
+      const tx = await eventContract.buyTicket({ value: price });
+      await tx.wait();
+      dismissToast(toastId);
+      showSuccess("Ticket purchased successfully!");
+    } catch (err) {
+      dismissToast(toastId);
+      showError("Transaction failed. Please try again.");
+      console.error(err);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-r from-[#2d5a3d] to-[#3d6b4a] text-white p-8 pt-28">
+        <Skeleton className="h-8 w-48 mb-12 bg-white/10" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+          <Skeleton className="w-full aspect-square rounded-2xl bg-white/10" />
+          <div className="lg:col-span-2 space-y-6">
+            <Skeleton className="h-16 w-3/4 bg-white/10" />
+            <Skeleton className="h-8 w-1/2 bg-white/10" />
+            <Skeleton className="h-24 w-full bg-white/10" />
+            <Skeleton className="h-40 w-full bg-white/10" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  const handleBuyTicket = () => {
-    addTicket(event);
-    showSuccess("Ticket purchased successfully!");
-  };
+  if (error || !event) {
+    return <NotFound />;
+  }
 
   return (
     <motion.div
