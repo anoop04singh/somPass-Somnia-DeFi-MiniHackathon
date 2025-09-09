@@ -22,10 +22,10 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Index />} />
         <Route path="/create" element={<CreateEvent />} />
-        <Route path="/event/:id" element={<EventDetail />} />
+        <Route path="/event/:address" element={<EventDetail />} />
         <Route path="/my-tickets" element={<MyTickets />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/dashboard/event/:id" element={<ManageEvent />} />
+        <Route path="/dashboard/event/:address" element={<ManageEvent />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
