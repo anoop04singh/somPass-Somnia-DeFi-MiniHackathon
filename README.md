@@ -52,7 +52,7 @@
 | **Styling**          | [Tailwind CSS](https://tailwindcss.com/), [shadcn/ui](https://ui.shadcn.com/), [Framer Motion](https://www.framer.com/motion/) |
 | **Blockchain**       | [Somnia Network](https://somnia.network/) (EVM L2), [Solidity](https://soliditylang.org/)                |
 | **Web3 Integration** | [ethers.js](https://ethers.io/)                                                                        |
-| **Data Indexing**    | [The Graph](https://thegraph.com/)                                                                     |
+| **Data Indexing**    | **Somnia Subgraphs** (powered by Ormi Labs)                                                            |
 | **Decentralized Storage** | [IPFS](https://ipfs.tech/) via [Pinata](https://www.pinata.cloud/)                                       |
 | **State Management** | [Zustand](https://zustand-demo.pmnd.rs/)                                                               |
 
@@ -62,7 +62,7 @@
 
 ### High-Level Architecture
 
-The application is designed with a decentralized-first approach. The frontend interacts directly with smart contracts for core logic, IPFS for data storage, and The Graph for efficient data querying.
+The application is designed with a decentralized-first approach. The frontend interacts directly with smart contracts for core logic, IPFS for data storage, and Somnia Subgraphs for efficient data querying.
 
 ```mermaid
 graph TD
@@ -77,7 +77,7 @@ graph TD
 
     subgraph Decentralized Services
         D[IPFS/Pinata for Metadata]
-        E[The Graph for Indexing]
+        E[Somnia Subgraphs for Indexing]
     end
 
     A -- 1. Create Event --> B
@@ -142,7 +142,7 @@ Each event is its own standalone ERC721 contract, ensuring separation of concern
 
 ### Why a Subgraph?
 
-Reading data directly from the blockchain is slow, expensive, and not scalable for complex queries (e.g., "get all tickets owned by this user" or "find all events created by this organizer"). The Graph indexes blockchain data and serves it through a high-performance GraphQL API, making the frontend fast and responsive.
+Reading data directly from the blockchain is slow, expensive, and not scalable for complex queries (e.g., "get all tickets owned by this user" or "find all events created by this organizer"). **Somnia Subgraphs** index blockchain data and serve it through a high-performance GraphQL API, making the frontend fast and responsive.
 
 ### How It Works
 
@@ -154,8 +154,8 @@ graph TD
         A[EventFactory & Event Contracts] -- Emits Events --> B{Event Logs}
     end
 
-    subgraph Off-Chain (The Graph)
-        C[Graph Node] -- Ingests --> B
+    subgraph Off-Chain (Somnia Subgraphs)
+        C[Subgraph Node] -- Ingests --> B
         C -- Processes via mapping.ts --> D[Indexed Data Store]
         D -- Serves --> E[GraphQL API]
     end
@@ -165,7 +165,7 @@ graph TD
     end
 ```
 
-- **`subgraph.yaml` (The Manifest)**: This file tells the Graph Node which contracts to watch. We define the `EventFactory` as a primary data source. Crucially, we use a `template` for the `Event` contract. When `handleEventCreated` is triggered, it dynamically creates a new data source to start indexing the newly deployed event contract.
+- **`subgraph.yaml` (The Manifest)**: This file tells the Subgraph Node which contracts to watch. We define the `EventFactory` as a primary data source. Crucially, we use a `template` for the `Event` contract. When `handleEventCreated` is triggered, it dynamically creates a new data source to start indexing the newly deployed event contract.
 - **`schema.graphql`**: Defines the shape of our data. We have two main entities: `Event` and `Ticket`.
 - **`mapping.ts` (The Handlers)**: This is the core logic that translates blockchain events into stored entities.
     - `handleEventCreated`: Creates a new `Event` entity and instantiates the dynamic template.
