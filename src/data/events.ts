@@ -10,6 +10,7 @@ export type EventMetadata = {
   imageUrl: string;
   description: string;
   organizers: Organizer[];
+  purchaseLimit?: number;
 };
 
 // This is the comprehensive Event object used in the frontend

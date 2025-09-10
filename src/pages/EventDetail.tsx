@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   Share2,
   Clock,
+  CheckCircle,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
@@ -47,14 +48,36 @@ const fetchEventDetail = async (address: string): Promise<Event | null> => {
   }
 };
 
+const fetchUserTicketCount = async (account: string | null, eventAddress: string): Promise<number> => {
+  if (!account || !eventAddress) return 0;
+  const query = `
+    query GetUserTickets($owner: Bytes!, $eventId: String!) {
+      tickets(where: { owner: $owner, event: $eventId }) {
+        id
+      }
+    }
+  `;
+  const response = await querySubgraph<{ tickets: { id: string }[] }>(query, {
+    owner: account.toLowerCase(),
+    eventId: eventAddress.toLowerCase(),
+  });
+  return response.tickets.length;
+};
+
 const EventDetail = () => {
   const { address } = useParams<{ address: string }>();
-  const { signer, isConnected, connectWallet } = useWeb3Store();
+  const { signer, account, isConnected, connectWallet } = useWeb3Store();
 
-  const { data: event, isLoading, error } = useQuery({
+  const { data: event, isLoading: isEventLoading, error } = useQuery({
     queryKey: ["event", address],
     queryFn: () => fetchEventDetail(address!),
     enabled: !!address,
+  });
+
+  const { data: userTicketCount, isLoading: isTicketCountLoading } = useQuery({
+    queryKey: ["userTicketCount", account, address],
+    queryFn: () => fetchUserTicketCount(account, address!),
+    enabled: isConnected && !!account && !!address,
   });
 
   const handleBuyTicket = async () => {
@@ -80,7 +103,7 @@ const EventDetail = () => {
     }
   };
 
-  if (isLoading) {
+  if (isEventLoading) {
     return (
       <div className="min-h-screen text-white p-8 pt-28">
         <Skeleton className="h-8 w-48 mb-12 bg-white/10" />
@@ -120,6 +143,46 @@ const EventDetail = () => {
     eventEndDate.setUTCHours(endHours, endMinutes);
   }
   const isEventOver = !isNaN(eventEndDate.getTime()) && eventEndDate < new Date();
+
+  const purchaseLimit = event.purchaseLimit || 1;
+  const userHasMaxTickets = (userTicketCount ?? 0) >= purchaseLimit;
+  const isBuyButtonDisabled = isTicketCountLoading || userHasMaxTickets || !isConnected;
+
+  const renderBuyButton = () => {
+    if (isEventOver) {
+      return (
+        <Button size="lg" disabled className="w-full sm:w-auto bg-gray-500 text-white/80">
+          <Clock className="w-4 h-4 mr-2" />
+          Event Has Ended
+        </Button>
+      );
+    }
+    if (!isConnected) {
+      return (
+        <Button onClick={connectWallet} size="lg" className="w-full sm:w-auto bg-amber-400 text-amber-950 font-bold hover:bg-amber-500">
+          Connect Wallet to Buy
+        </Button>
+      );
+    }
+    return (
+      <Button
+        onClick={handleBuyTicket}
+        size="lg"
+        className="w-full sm:w-auto bg-amber-400 text-amber-950 font-bold hover:bg-amber-500 disabled:bg-gray-500 disabled:text-white/80"
+        disabled={isBuyButtonDisabled}
+      >
+        {userHasMaxTickets ? (
+          <>
+            <CheckCircle className="w-4 h-4 mr-2" /> Ticket Acquired
+          </>
+        ) : (
+          <>
+            <Ticket className="w-4 h-4 mr-2" /> Get Ticket
+          </>
+        )}
+      </Button>
+    );
+  };
 
   return (
     <motion.div
@@ -210,21 +273,7 @@ const EventDetail = () => {
                         ? "Free"
                         : `${event.ticketPrice} SOM`}
                     </div>
-                    {isEventOver ? (
-                      <Button size="lg" disabled className="w-full sm:w-auto bg-gray-500 text-white/80">
-                        <Clock className="w-4 h-4 mr-2" />
-                        Event Has Ended
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={handleBuyTicket}
-                        size="lg"
-                        className="w-full sm:w-auto bg-amber-400 text-amber-950 font-bold hover:bg-amber-500"
-                      >
-                        <Ticket className="w-4 h-4 mr-2" />
-                        Get Ticket
-                      </Button>
-                    )}
+                    {renderBuyButton()}
                   </div>
                   <p className="text-sm text-white/60 mb-6">
                     {event.ticketSupply - event.attendees} spots left

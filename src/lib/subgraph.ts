@@ -49,6 +49,7 @@ export const mapSubgraphEventToEvent = async (subgraphEvent: SubgraphEvent): Pro
   const metadata: EventMetadata = {
     ...rawMetadata,
     startDate: rawMetadata.startDate || rawMetadata.date,
+    purchaseLimit: rawMetadata.purchaseLimit || 1, // Default to 1 if not specified
   };
 
   return {

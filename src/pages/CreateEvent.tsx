@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { Header } from "@/components/Header";
-import { UploadCloud, Ticket, Users } from "lucide-react";
+import { UploadCloud, Ticket, Users, UserCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ const CreateEvent = () => {
   const [endTime, setEndTime] = useState("");
   const [ticketPrice, setTicketPrice] = useState(0);
   const [ticketSupply, setTicketSupply] = useState(100);
+  const [purchaseLimit, setPurchaseLimit] = useState(1);
 
   // Image state
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -78,6 +79,7 @@ const CreateEvent = () => {
         description,
         imageUrl,
         organizers: [{ name: "My Organization", logoUrl: "" }],
+        purchaseLimit,
       });
       
       dismissToast(toastId);
@@ -151,6 +153,34 @@ const CreateEvent = () => {
                   </div>
                 </CardContent>
               </Card>
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <CardTitle>Ticketing</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="ticket-price">Ticket Price (SOM)</Label>
+                    <div className="relative">
+                      <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
+                      <Input id="ticket-price" type="number" value={ticketPrice} onChange={(e) => setTicketPrice(parseFloat(e.target.value))} className="bg-white/10 border-white/20 pl-10" step="0.01" min="0" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="capacity">Capacity</Label>
+                    <div className="relative">
+                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
+                      <Input id="capacity" type="number" value={ticketSupply} onChange={(e) => setTicketSupply(parseInt(e.target.value))} className="bg-white/10 border-white/20 pl-10" min="1" />
+                    </div>
+                  </div>
+                   <div className="space-y-2">
+                    <Label htmlFor="purchase-limit">Tickets per Wallet</Label>
+                    <div className="relative">
+                      <UserCheck className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
+                      <Input id="purchase-limit" type="number" value={purchaseLimit} onChange={(e) => setPurchaseLimit(parseInt(e.target.value))} className="bg-white/10 border-white/20 pl-10" min="1" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Right Column */}
@@ -194,28 +224,6 @@ const CreateEvent = () => {
                         <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-white/10 border-white/20" required />
                         <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="bg-white/10 border-white/20" required />
                       </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white/5 border-white/10">
-                <CardHeader>
-                  <CardTitle>Ticketing</CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="ticket-price">Ticket Price (SOM)</Label>
-                    <div className="relative">
-                      <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
-                      <Input id="ticket-price" type="number" value={ticketPrice} onChange={(e) => setTicketPrice(parseFloat(e.target.value))} className="bg-white/10 border-white/20 pl-10" step="0.01" min="0" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="capacity">Capacity</Label>
-                    <div className="relative">
-                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
-                      <Input id="capacity" type="number" value={ticketSupply} onChange={(e) => setTicketSupply(parseInt(e.target.value))} className="bg-white/10 border-white/20 pl-10" min="1" />
                     </div>
                   </div>
                 </CardContent>
