@@ -1,7 +1,8 @@
 // This is the structure of the metadata stored on IPFS
 export type EventMetadata = {
   title: string;
-  date: string;
+  startDate: string; // This was previously 'date'
+  endDate?: string; // Optional end date for multi-day events
   startTime: string;
   endTime: string;
   location: string;

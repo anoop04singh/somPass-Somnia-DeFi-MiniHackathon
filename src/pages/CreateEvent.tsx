@@ -25,6 +25,7 @@ const CreateEvent = () => {
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
   const [ticketPrice, setTicketPrice] = useState(0);
   const [ticketSupply, setTicketSupply] = useState(100);
@@ -68,7 +69,8 @@ const CreateEvent = () => {
 
       const metadataCID = await uploadMetadataToIPFS({
         title: eventName,
-        date: new Date(startDate).toISOString(),
+        startDate: new Date(startDate).toISOString(),
+        endDate: new Date(endDate).toISOString(),
         startTime,
         endTime,
         location,
@@ -115,171 +117,117 @@ const CreateEvent = () => {
       className="min-h-screen text-white"
     >
       <Header />
-      <main className="max-w-4xl mx-auto px-6 py-10 pt-28">
+      <main className="max-w-6xl mx-auto px-6 py-10 pt-28">
         <h1 className="text-4xl font-bold tracking-tight mb-8">Create a New Event</h1>
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader>
-              <CardTitle>Event Image</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImageChange}
-                className="hidden"
-                accept="image/png, image/jpeg, image/gif"
-              />
-              <div
-                className="relative aspect-video bg-black/20 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-white/20 cursor-pointer hover:border-amber-400/50 hover:bg-black/30 transition-colors"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {imagePreview ? (
-                  <img src={imagePreview} alt="Event preview" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center text-white/60">
-                    <UploadCloud className="mx-auto h-12 w-12" />
-                    <p className="mt-2">Click or drag file to this area to upload</p>
-                    <p className="text-xs">PNG, JPG, GIF up to 10MB</p>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            {/* Left Column */}
+            <div className="lg:col-span-1 space-y-8 sticky top-28">
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <CardTitle>Event Image</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
+                    className="hidden"
+                    accept="image/png, image/jpeg, image/gif"
+                  />
+                  <div
+                    className="relative aspect-video bg-black/20 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-white/20 cursor-pointer hover:border-amber-400/50 hover:bg-black/30 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {imagePreview ? (
+                      <img src={imagePreview} alt="Event preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="text-center text-white/60">
+                        <UploadCloud className="mx-auto h-12 w-12" />
+                        <p className="mt-2">Click to upload</p>
+                        <p className="text-xs">PNG, JPG, GIF up to 10MB</p>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </div>
 
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader>
-              <CardTitle>Event Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="event-name">Event Name</Label>
-                <Input
-                  id="event-name"
-                  type="text"
-                  placeholder="e.g. Somnia Network Launch Party"
-                  value={eventName}
-                  onChange={(e) => setEventName(e.target.value)}
-                  className="bg-white/10 border-white/20 placeholder:text-white/60 h-12 text-lg"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  type="text"
-                  placeholder="📍 Offline location or virtual link"
-                  className="bg-white/10 border-white/20 placeholder:text-white/60 h-12"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="📝 Tell us more about your event..."
-                  className="bg-white/10 border-white/20 placeholder:text-white/60 min-h-[120px]"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  required
-                />
-              </div>
-            </CardContent>
-          </Card>
+            {/* Right Column */}
+            <div className="lg:col-span-2 space-y-8">
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <CardTitle>Event Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="event-name">Event Name</Label>
+                    <Input id="event-name" type="text" value={eventName} onChange={(e) => setEventName(e.target.value)} className="bg-white/10 border-white/20" required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Location</Label>
+                    <Input id="location" type="text" value={location} onChange={(e) => setLocation(e.target.value)} className="bg-white/10 border-white/20" required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} className="bg-white/10 border-white/20 min-h-[100px]" required />
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader>
-              <CardTitle>Date & Time</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="start-date">Start Date & Time</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="start-date"
-                    type="date"
-                    className="bg-white/10 border-white/20"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    required
-                  />
-                  <Input
-                    type="time"
-                    className="bg-white/10 border-white/20"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="end-time">End Time</Label>
-                <Input
-                  id="end-time"
-                  type="time"
-                  className="bg-white/10 border-white/20"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  required
-                />
-                 <p className="text-xs text-white/60">Assuming event ends on the same day.</p>
-              </div>
-            </CardContent>
-          </Card>
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <CardTitle>Date & Time</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Event Start</Label>
+                      <div className="flex gap-2">
+                        <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="bg-white/10 border-white/20" required />
+                        <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="bg-white/10 border-white/20" required />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Event End</Label>
+                      <div className="flex gap-2">
+                        <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-white/10 border-white/20" required />
+                        <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="bg-white/10 border-white/20" required />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader>
-              <CardTitle>Ticketing</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="ticket-price">Ticket Price (SOM)</Label>
-                <div className="relative">
-                  <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
-                  <Input
-                    id="ticket-price"
-                    type="number"
-                    className="bg-white/10 border-white/20 pl-10"
-                    value={ticketPrice}
-                    onChange={(e) => setTicketPrice(parseFloat(e.target.value))}
-                    step="0.01"
-                    min="0"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="capacity">Capacity</Label>
-                <div className="relative">
-                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
-                  <Input
-                    id="capacity"
-                    type="number"
-                    className="bg-white/10 border-white/20 pl-10"
-                    value={ticketSupply}
-                    onChange={(e) => setTicketSupply(parseInt(e.target.value))}
-                    min="1"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <CardTitle>Ticketing</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="ticket-price">Ticket Price (SOM)</Label>
+                    <div className="relative">
+                      <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
+                      <Input id="ticket-price" type="number" value={ticketPrice} onChange={(e) => setTicketPrice(parseFloat(e.target.value))} className="bg-white/10 border-white/20 pl-10" step="0.01" min="0" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="capacity">Capacity</Label>
+                    <div className="relative">
+                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
+                      <Input id="capacity" type="number" value={ticketSupply} onChange={(e) => setTicketSupply(parseInt(e.target.value))} className="bg-white/10 border-white/20 pl-10" min="1" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
 
-          <div className="flex gap-4 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full bg-transparent border-white/30 hover:bg-white/10 h-12 text-base"
-              onClick={handleCancel}
-            >
+          <div className="flex gap-4 pt-8 mt-8 border-t border-white/10">
+            <Button type="button" variant="outline" className="w-full lg:w-auto bg-transparent border-white/30 hover:bg-white/10 h-12 text-base" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              className="w-full bg-amber-400 text-amber-950 font-bold text-base h-12 hover:bg-amber-500"
-            >
+            <Button type="submit" className="w-full lg:w-auto flex-grow bg-amber-400 text-amber-950 font-bold text-base h-12 hover:bg-amber-500">
               Create Event
             </Button>
           </div>

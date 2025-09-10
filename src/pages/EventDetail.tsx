@@ -101,15 +101,25 @@ const EventDetail = () => {
     return <NotFound />;
   }
 
-  const eventDate = new Date(event.date);
-  const [hours, minutes] = event.startTime.split(':').map(Number);
-  if (!isNaN(eventDate.getTime())) {
-    eventDate.setUTCHours(hours, minutes);
+  const getEventDateDisplay = () => {
+    const startDate = new Date(event.startDate);
+    const endDate = event.endDate ? new Date(event.endDate) : startDate;
+
+    if (isNaN(startDate.getTime())) return "Date to be determined";
+
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric' };
+    if (startDate.toDateString() === endDate.toDateString()) {
+      return startDate.toLocaleDateString("en-US", options);
+    }
+    return `${startDate.toLocaleDateString("en-US", options)} - ${endDate.toLocaleDateString("en-US", options)}`;
+  };
+
+  const eventEndDate = event.endDate ? new Date(event.endDate) : new Date(event.startDate);
+  const [endHours, endMinutes] = event.endTime.split(':').map(Number);
+  if (!isNaN(eventEndDate.getTime())) {
+    eventEndDate.setUTCHours(endHours, endMinutes);
   }
-  const isEventOver = !isNaN(eventDate.getTime()) && eventDate < new Date();
-  const displayDate = !isNaN(eventDate.getTime())
-    ? eventDate.toLocaleDateString("en-US", { weekday: 'long', month: 'long', day: 'numeric' })
-    : "Date to be determined";
+  const isEventOver = !isNaN(eventEndDate.getTime()) && eventEndDate < new Date();
 
   return (
     <motion.div
@@ -175,7 +185,7 @@ const EventDetail = () => {
                     <Calendar className="w-5 h-5 text-white/80" />
                   </div>
                   <div>
-                    <p className="font-semibold">{displayDate}</p>
+                    <p className="font-semibold">{getEventDateDisplay()}</p>
                     <p className="text-white/60 text-sm">{`${event.startTime} - ${event.endTime}`}</p>
                   </div>
                 </div>

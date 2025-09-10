@@ -43,7 +43,13 @@ export interface SubgraphEvent {
 export const mapSubgraphEventToEvent = async (subgraphEvent: SubgraphEvent): Promise<Event> => {
   const metadataUrl = getIPFSUrl(subgraphEvent.metadataCID);
   const metadataResponse = await fetch(metadataUrl);
-  const metadata: EventMetadata = await metadataResponse.json();
+  const rawMetadata: any = await metadataResponse.json();
+
+  // Handle both old ('date') and new ('startDate') formats for backward compatibility
+  const metadata: EventMetadata = {
+    ...rawMetadata,
+    startDate: rawMetadata.startDate || rawMetadata.date,
+  };
 
   return {
     ...metadata,
