@@ -63,7 +63,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     background-color: #0a1910;
     background-image: linear-gradient(135deg, #0a1910 0%, #1a3a24 100%);
     min-height: 100vh;
