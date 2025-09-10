@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { Header } from "@/components/Header";
-import { UploadCloud, Ticket, Users, UserCheck } from "lucide-react";
+import { UploadCloud, Ticket, Users, UserCheck, Building } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -30,11 +30,15 @@ const CreateEvent = () => {
   const [ticketPrice, setTicketPrice] = useState(0);
   const [ticketSupply, setTicketSupply] = useState(100);
   const [purchaseLimit, setPurchaseLimit] = useState(1);
+  const [organizerName, setOrganizerName] = useState("");
 
   // Image state
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [organizerLogoFile, setOrganizerLogoFile] = useState<File | null>(null);
+  const [organizerLogoPreview, setOrganizerLogoPreview] = useState<string | null>(null);
+  const logoFileInputRef = useRef<HTMLInputElement>(null);
 
   const showConfirmation = useAlertStore((state) => state.showConfirmation);
   const navigate = useNavigate();
@@ -48,6 +52,14 @@ const CreateEvent = () => {
     }
   };
 
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setOrganizerLogoFile(file);
+      setOrganizerLogoPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isConnected || !signer) {
@@ -55,15 +67,19 @@ const CreateEvent = () => {
       await connectWallet();
       return;
     }
-    if (!imageFile) {
-      showError("Please upload an event image.");
+    if (!imageFile || !organizerLogoFile) {
+      showError("Please upload both an event image and an organizer logo.");
       return;
     }
 
-    let toastId = showLoading("Uploading event image...");
+    let toastId = showLoading("Uploading images...");
     try {
-      const imageCID = await uploadFileToIPFS(imageFile);
+      const [imageCID, logoCID] = await Promise.all([
+        uploadFileToIPFS(imageFile),
+        uploadFileToIPFS(organizerLogoFile),
+      ]);
       const imageUrl = getIPFSUrl(imageCID);
+      const logoUrl = getIPFSUrl(logoCID);
 
       dismissToast(toastId);
       toastId = showLoading("Uploading event details...");
@@ -78,7 +94,7 @@ const CreateEvent = () => {
         locationDetail: "Details to be added",
         description,
         imageUrl,
-        organizers: [{ name: "My Organization", logoUrl: "" }],
+        organizers: [{ name: organizerName, logoUrl: logoUrl }],
         purchaseLimit,
       });
       
@@ -201,6 +217,32 @@ const CreateEvent = () => {
                   <div className="space-y-2">
                     <Label htmlFor="description">Description</Label>
                     <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} className="bg-white/10 border-white/20 min-h-[100px]" required />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <CardTitle>Organizer</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+                  <div className="space-y-2">
+                    <Label htmlFor="organizer-name">Organizer Name</Label>
+                    <Input id="organizer-name" type="text" value={organizerName} onChange={(e) => setOrganizerName(e.target.value)} className="bg-white/10 border-white/20" required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Organizer Logo</Label>
+                    <div className="flex items-center gap-4">
+                      <input type="file" ref={logoFileInputRef} onChange={handleLogoChange} className="hidden" accept="image/png, image/jpeg, image/gif" />
+                      <div className="relative w-20 h-20 bg-black/20 rounded-full flex items-center justify-center overflow-hidden border-2 border-dashed border-white/20 cursor-pointer hover:border-amber-400/50" onClick={() => logoFileInputRef.current?.click()}>
+                        {organizerLogoPreview ? (
+                          <img src={organizerLogoPreview} alt="Logo preview" className="w-full h-full object-cover" />
+                        ) : (
+                          <Building className="w-8 h-8 text-white/60" />
+                        )}
+                      </div>
+                      <Button type="button" variant="outline" className="bg-transparent border-white/30 hover:bg-white/10" onClick={() => logoFileInputRef.current?.click()}>Upload Logo</Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
