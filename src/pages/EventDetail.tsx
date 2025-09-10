@@ -81,7 +81,7 @@ const EventDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-r from-[#2d5a3d] to-[#3d6b4a] text-white p-8 pt-28">
+      <div className="min-h-screen text-white p-8 pt-28">
         <Skeleton className="h-8 w-48 mb-12 bg-white/10" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           <Skeleton className="w-full aspect-square rounded-2xl bg-white/10" />
@@ -107,9 +107,6 @@ const EventDetail = () => {
       exit="exit"
       variants={pageTransition}
       className="min-h-screen text-white"
-      style={{
-        background: "linear-gradient(135deg, #2d5a3d 0%, #3d6b4a 100%)",
-      }}
     >
       <Header />
       <main className="flex-grow container mx-auto px-6 py-10 pt-28">

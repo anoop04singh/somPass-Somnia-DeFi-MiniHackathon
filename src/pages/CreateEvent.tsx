@@ -2,11 +2,10 @@
 
 import React, { useState } from "react";
 import { Header } from "@/components/Header";
-import { Camera, Globe, Ticket, UserCheck, Users } from "lucide-react";
+import { Camera, Globe, Ticket, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { motion } from "framer-motion";
@@ -88,10 +87,7 @@ const CreateEvent = () => {
       animate="animate"
       exit="exit"
       variants={pageTransition}
-      style={{
-        background: "linear-gradient(135deg, #2d5a3d 0%, #3d6b4a 100%)",
-      }}
-      className="min-h-screen text-white font-sans"
+      className="min-h-screen text-white"
     >
       <Header />
       <main className="max-w-7xl mx-auto px-6 py-10 pt-28">

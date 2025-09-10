@@ -70,9 +70,6 @@ const MyTickets = () => {
       exit="exit"
       variants={pageTransition}
       className="min-h-screen text-white"
-      style={{
-        background: "linear-gradient(135deg, #2d5a3d 0%, #3d6b4a 100%)",
-      }}
     >
       <Header />
       <main className="container mx-auto px-6 py-10 pt-28 flex-grow">
