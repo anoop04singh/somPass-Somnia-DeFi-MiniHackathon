@@ -27,7 +27,7 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
             <div className="space-y-2 text-sm text-white/80">
               <div className="flex items-center">
                 <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
-                <span>{`${event.date} at ${event.startTime}`}</span>
+                <span>{`${new Date(event.date).toLocaleDateString("en-US", { month: 'long', day: 'numeric' })} at ${event.startTime}`}</span>
               </div>
               <div className="flex items-center">
                 <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />

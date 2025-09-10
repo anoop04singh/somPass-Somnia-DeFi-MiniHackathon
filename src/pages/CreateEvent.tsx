@@ -44,7 +44,7 @@ const CreateEvent = () => {
     try {
       const metadataCID = await uploadToIPFS({
         title: eventName,
-        date: new Date(startDate).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }),
+        date: new Date(startDate).toISOString(),
         startTime,
         endTime,
         location,

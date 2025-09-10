@@ -8,6 +8,7 @@ import {
   Ticket,
   ArrowLeft,
   Share2,
+  Clock,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
@@ -100,6 +101,11 @@ const EventDetail = () => {
     return <NotFound />;
   }
 
+  const eventDate = new Date(event.date);
+  const [hours, minutes] = event.startTime.split(':').map(Number);
+  eventDate.setUTCHours(hours, minutes);
+  const isEventOver = eventDate < new Date();
+
   return (
     <motion.div
       initial="initial"
@@ -164,7 +170,7 @@ const EventDetail = () => {
                     <Calendar className="w-5 h-5 text-white/80" />
                   </div>
                   <div>
-                    <p className="font-semibold">{event.date}</p>
+                    <p className="font-semibold">{new Date(event.date).toLocaleDateString("en-US", { weekday: 'long', month: 'long', day: 'numeric' })}</p>
                     <p className="text-white/60 text-sm">{`${event.startTime} - ${event.endTime}`}</p>
                   </div>
                 </div>
@@ -189,14 +195,21 @@ const EventDetail = () => {
                         ? "Free"
                         : `${event.ticketPrice} SOM`}
                     </div>
-                    <Button
-                      onClick={handleBuyTicket}
-                      size="lg"
-                      className="w-full sm:w-auto bg-amber-400 text-amber-950 font-bold hover:bg-amber-500"
-                    >
-                      <Ticket className="w-4 h-4 mr-2" />
-                      Get Ticket
-                    </Button>
+                    {isEventOver ? (
+                      <Button size="lg" disabled className="w-full sm:w-auto bg-gray-500 text-white/80">
+                        <Clock className="w-4 h-4 mr-2" />
+                        Event Has Ended
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={handleBuyTicket}
+                        size="lg"
+                        className="w-full sm:w-auto bg-amber-400 text-amber-950 font-bold hover:bg-amber-500"
+                      >
+                        <Ticket className="w-4 h-4 mr-2" />
+                        Get Ticket
+                      </Button>
+                    )}
                   </div>
                   <p className="text-sm text-white/60 mb-6">
                     {event.ticketSupply - event.attendees} spots left

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { Search, Bell, User, Wallet, Settings, LogOut } from "lucide-react";
+import { Search, Bell, User, Wallet, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -114,13 +114,6 @@ export const Header = () => {
                   >
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => showSuccess("Settings page coming soon!")}
-                    className="focus:bg-white/10 focus:text-white"
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-white/20" />
                   <DropdownMenuItem
