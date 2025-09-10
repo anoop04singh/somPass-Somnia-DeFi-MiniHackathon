@@ -43,7 +43,7 @@ export const Header = () => {
           <div className="flex items-center gap-8">
             <Link
               to="/"
-              className="text-lg font-semibold tracking-tight opacity-90"
+              className="text-lg font-semibold tracking-tight text-amber-300"
             >
               SomPas
             </Link>
@@ -88,7 +88,7 @@ export const Header = () => {
                     className="relative h-8 w-8 rounded-full p-0"
                   >
                     <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-white text-green-900 font-bold">
+                      <AvatarFallback className="bg-amber-400 text-amber-950 font-bold">
                         {account?.substring(2, 4).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -138,7 +138,7 @@ export const Header = () => {
             ) : (
               <Button
                 onClick={handleWalletConnect}
-                className="bg-white text-green-900 font-bold hover:bg-gray-200"
+                className="bg-amber-400 text-amber-950 font-bold hover:bg-amber-500"
               >
                 <Wallet className="mr-2 h-4 w-4" />
                 Connect Wallet

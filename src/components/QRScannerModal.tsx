@@ -51,7 +51,7 @@ export const QRScannerModal = ({ isOpen, onClose, onScanSuccess }: QRScannerModa
       case "success":
         return (
           <div className="flex flex-col items-center gap-4 text-center">
-            <CheckCircle className="w-24 h-24 text-green-400" />
+            <CheckCircle className="w-24 h-24 text-amber-400" />
             <h3 className="text-2xl font-bold">Check-in Successful</h3>
             <p className="text-white/80">Ticket ID: {scannedTicket}</p>
           </div>
@@ -75,7 +75,7 @@ export const QRScannerModal = ({ isOpen, onClose, onScanSuccess }: QRScannerModa
         </DialogHeader>
         <div className="py-6">{renderContent()}</div>
         {status !== "scanning" && (
-           <Button onClick={onClose} className="w-full bg-white text-green-900 font-bold hover:bg-gray-200">
+           <Button onClick={onClose} className="w-full bg-amber-400 text-amber-950 font-bold hover:bg-amber-500">
              Close
            </Button>
         )}

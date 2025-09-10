@@ -113,7 +113,7 @@ const MyTickets = () => {
             </p>
             <Button
               asChild
-              className="bg-white text-green-900 font-bold hover:bg-gray-200"
+              className="bg-amber-400 text-amber-950 font-bold hover:bg-amber-500"
             >
               <Link to="/">Discover Events</Link>
             </Button>

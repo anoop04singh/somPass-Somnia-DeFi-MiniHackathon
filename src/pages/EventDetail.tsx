@@ -192,7 +192,7 @@ const EventDetail = () => {
                     <Button
                       onClick={handleBuyTicket}
                       size="lg"
-                      className="w-full sm:w-auto bg-white text-green-900 font-bold hover:bg-gray-200"
+                      className="w-full sm:w-auto bg-amber-400 text-amber-950 font-bold hover:bg-amber-500"
                     >
                       <Ticket className="w-4 h-4 mr-2" />
                       Get Ticket

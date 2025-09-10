@@ -36,7 +36,7 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
-              <AvatarFallback className="bg-white text-green-900 font-bold text-2xl">
+              <AvatarFallback className="bg-amber-400 text-amber-950 font-bold text-2xl">
                 S
               </AvatarFallback>
             </Avatar>

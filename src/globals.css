@@ -64,8 +64,8 @@
 
   body {
     @apply text-foreground;
-    background-color: #0a1910;
-    background-image: linear-gradient(135deg, #0a1910 0%, #1a3a24 100%);
+    background-color: #1c1108;
+    background-image: linear-gradient(135deg, #1c1108 0%, #4a2e1a 100%);
     min-height: 100vh;
   }
 }
@@ -80,15 +80,15 @@
 
   .card-glow:hover {
     transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 0 40px 5px rgba(52, 211, 153, 0.15);
-    border-color: rgba(52, 211, 153, 0.3);
+    box-shadow: 0 0 40px 5px rgba(255, 217, 125, 0.15);
+    border-color: rgba(255, 217, 125, 0.3);
     background-color: rgba(255, 255, 255, 0.05);
   }
 
   .dialog-glow {
     @apply relative overflow-hidden backdrop-blur-lg;
     background-color: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(52, 211, 153, 0.3);
-    box-shadow: 0 0 40px 5px rgba(52, 211, 153, 0.15);
+    border: 1px solid rgba(255, 217, 125, 0.3);
+    box-shadow: 0 0 40px 5px rgba(255, 217, 125, 0.15);
   }
 }

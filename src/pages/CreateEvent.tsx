@@ -229,7 +229,7 @@ const CreateEvent = () => {
                 </Button>
                 <Button
                   type="submit"
-                  className="w-full bg-white text-green-900 font-bold text-base h-12 hover:bg-gray-200"
+                  className="w-full bg-amber-400 text-amber-950 font-bold text-base h-12 hover:bg-amber-500"
                 >
                   Create Event
                 </Button>

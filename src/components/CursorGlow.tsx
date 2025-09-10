@@ -19,7 +19,7 @@ export const CursorGlow = () => {
     <div
       className="pointer-events-none fixed inset-0 z-[100] transition duration-300"
       style={{
-        background: `radial-gradient(600px at ${position.x}px ${position.y}px, rgba(22, 163, 74, 0.15), transparent 80%)`,
+        background: `radial-gradient(600px at ${position.x}px ${position.y}px, rgba(255, 217, 125, 0.2), transparent 80%)`,
       }}
     />
   );

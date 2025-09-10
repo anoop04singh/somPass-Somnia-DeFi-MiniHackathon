@@ -30,7 +30,7 @@ export const EventCard = ({ event }: EventCardProps) => {
           </div>
         </CardHeader>
         <CardContent className="p-0 flex-grow">
-          <p className="text-sm font-semibold text-green-300/80 mb-1">
+          <p className="text-sm font-semibold text-amber-300/80 mb-1">
             {event.date.toUpperCase()}
           </p>
           <CardTitle className="text-lg font-semibold text-white mb-2 leading-tight">

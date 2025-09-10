@@ -53,7 +53,7 @@ export const AlertProvider = () => {
           )}
           <AlertDialogAction
             onClick={handleConfirm}
-            className="bg-white text-green-900 hover:bg-gray-200"
+            className="bg-amber-400 text-amber-950 hover:bg-amber-500"
           >
             {confirmText || (type === "confirmation" ? "Confirm" : "OK")}
           </AlertDialogAction>
