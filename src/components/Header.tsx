@@ -43,9 +43,9 @@ export const Header = () => {
           <div className="flex items-center gap-8">
             <Link
               to="/"
-              className="text-lg font-semibold tracking-tight text-amber-300"
+              className="text-lg font-semibold tracking-tight text-amber-300 drop-shadow-[0_0_8px_rgba(252,211,77,0.5)] transition-all duration-300 hover:drop-shadow-[0_0_12px_rgba(252,211,77,0.8)]"
             >
-              SomPas
+              SomPass
             </Link>
             <nav className="hidden md:flex items-center gap-8">
               {navItems.map((item) => (
