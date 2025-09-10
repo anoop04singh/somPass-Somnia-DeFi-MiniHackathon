@@ -16,6 +16,10 @@ interface EventCardProps {
 
 export const EventCard = ({ event }: EventCardProps) => {
   const primaryOrganizer = event.organizers[0];
+  const eventDate = new Date(event.date);
+  const displayDate = !isNaN(eventDate.getTime())
+    ? eventDate.toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()
+    : "DATE TBD";
 
   return (
     <motion.div>
@@ -31,7 +35,7 @@ export const EventCard = ({ event }: EventCardProps) => {
         </CardHeader>
         <CardContent className="p-0 flex-grow">
           <p className="text-sm font-semibold text-amber-300/80 mb-1">
-            {new Date(event.date).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
+            {displayDate}
           </p>
           <CardTitle className="text-lg font-semibold text-white mb-2 leading-tight">
             {event.title}
