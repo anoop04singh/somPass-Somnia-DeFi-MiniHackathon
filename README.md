@@ -99,7 +99,7 @@ v
 | Event Contracts - ERC721      |
 +-------------------------------+
 
-```javascript
+```
 
 ### Event Creation Workflow
 
@@ -222,7 +222,7 @@ v
 | GraphQL API         |
 +---------------------+
 
-```javascript
+```
 
 - **`subgraph.yaml` (The Manifest)**: This file tells the Subgraph Node which contracts to watch. We define the `EventFactory` as a primary data source. Crucially, we use a `template` for the `Event` contract. When `handleEventCreated` is triggered, it dynamically creates a new data source to start indexing the newly deployed event contract.
 - **`schema.graphql`**: Defines the shape of our data. We have two main entities: `Event` and `Ticket`.
@@ -263,7 +263,7 @@ All event metadata (title, description, images) is stored on IPFS to keep the pl
 "purchaseLimit": 2
 }
 
-```javascript
+```
 
 ---
 
@@ -283,7 +283,7 @@ The QR code is the key to the check-in process, bridging the digital NFT ticket 
 "ticketId": "1"
 }
 
-```javascript
+```
 
 - **`eventId`**: The contract address of the event.
 - **`ticketId`**: The unique token ID of the NFT ticket.
@@ -311,7 +311,7 @@ To run this project locally, follow these steps:
 git clone <repository-url>
 cd sompass-project
 
-```javascript
+```
 
 1.  Install dependencies:
 
@@ -319,7 +319,7 @@ cd sompass-project
 
 npm install
 
-```javascript
+```
 
 1.  Set up environment variables. Create a `.env` file by copying `.env.example`:
 
@@ -327,7 +327,7 @@ npm install
 
 cp .env.example .env
 
-```javascript
+```
 
 Fill in your Pinata API keys in the `.env` file:
 
@@ -336,7 +336,7 @@ Fill in your Pinata API keys in the `.env` file:
 VITE_PINATA_API_KEY=your_pinata_api_key
 VITE_PINATA_SECRET_KEY=your_pinata_secret_key
 
-```javascript
+```
 
 1.  Run the development server:
 
