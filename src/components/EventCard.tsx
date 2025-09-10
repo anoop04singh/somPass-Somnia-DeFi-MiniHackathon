@@ -18,10 +18,10 @@ export const EventCard = ({ event }: EventCardProps) => {
   const primaryOrganizer = event.organizers[0];
 
   return (
-    <motion.div whileHover={{ y: -5 }}>
-      <Card className="overflow-hidden h-full flex flex-col group border-none bg-transparent shadow-none">
+    <motion.div>
+      <Card className="card-glow h-full flex flex-col group p-4">
         <CardHeader className="p-0 mb-4">
-          <div className="overflow-hidden rounded-xl">
+          <div className="overflow-hidden rounded-lg">
             <img
               src={event.imageUrl}
               alt={event.title}
@@ -30,7 +30,7 @@ export const EventCard = ({ event }: EventCardProps) => {
           </div>
         </CardHeader>
         <CardContent className="p-0 flex-grow">
-          <p className="text-sm font-semibold text-white/80 mb-1">
+          <p className="text-sm font-semibold text-green-300/80 mb-1">
             {event.date.toUpperCase()}
           </p>
           <CardTitle className="text-lg font-semibold text-white mb-2 leading-tight">

@@ -38,7 +38,7 @@ export const Header = () => {
 
   return (
     <>
-      <header className="absolute top-0 z-50 w-full text-white">
+      <header className="fixed top-0 z-50 w-full text-white bg-black/10 backdrop-blur-md">
         <div className="container mx-auto flex items-center justify-between p-4 h-20">
           <div className="flex items-center gap-8">
             <Link
@@ -95,7 +95,7 @@ export const Header = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className="w-56 bg-black/50 backdrop-blur-lg border-white/20 text-white"
+                  className="w-56 dialog-glow text-white"
                   align="end"
                   forceMount
                 >
@@ -153,4 +153,3 @@ export const Header = () => {
       />
     </>
   );
-};

@@ -10,7 +10,7 @@ interface TicketCardProps {
 export const TicketCard = ({ ticket }: TicketCardProps) => {
   const { event } = ticket;
   return (
-    <Card className="overflow-hidden transition-shadow hover:shadow-lg bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl">
+    <Card className="card-glow overflow-hidden rounded-xl">
       <div className="flex flex-col sm:flex-row">
         <img
           src={event.imageUrl}

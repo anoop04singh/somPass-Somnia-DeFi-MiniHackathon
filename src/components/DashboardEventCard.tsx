@@ -14,7 +14,7 @@ export const DashboardEventCard = ({ event }: DashboardEventCardProps) => {
   const attendancePercentage = capacity > 0 ? ((ticketsSold / capacity) * 100).toFixed(0) : 0;
 
   return (
-    <Card className="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl text-white">
+    <Card className="card-glow rounded-xl text-white">
       <CardHeader>
         <CardTitle className="text-xl font-semibold">{event.title}</CardTitle>
         <div className="flex items-center text-sm text-white/60 mt-1">

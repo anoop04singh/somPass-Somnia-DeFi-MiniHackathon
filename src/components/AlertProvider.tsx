@@ -35,7 +35,7 @@ export const AlertProvider = () => {
 
   return (
     <AlertDialog open={isOpen} onOpenChange={hideAlert}>
-      <AlertDialogContent className="bg-white/10 backdrop-blur-lg border border-white/20 text-white">
+      <AlertDialogContent className="dialog-glow text-white">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription className="text-white/70">

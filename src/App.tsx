@@ -12,6 +12,7 @@ import ManageEvent from "./pages/ManageEvent";
 import NotFound from "./pages/NotFound";
 import { AnimatePresence } from "framer-motion";
 import { AlertProvider } from "./components/AlertProvider";
+import { CursorGlow } from "./components/CursorGlow";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const AnimatedRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <CursorGlow />
       <Toaster />
       <Sonner />
       <AlertProvider />

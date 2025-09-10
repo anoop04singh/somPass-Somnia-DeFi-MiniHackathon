@@ -26,7 +26,7 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-white/10 backdrop-blur-lg border border-white/20 text-white">
+      <DialogContent className="sm:max-w-[425px] dialog-glow text-white">
         <DialogHeader>
           <DialogTitle className="text-white">User Profile</DialogTitle>
           <DialogDescription className="text-white/70">

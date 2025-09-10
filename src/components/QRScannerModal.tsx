@@ -69,7 +69,7 @@ export const QRScannerModal = ({ isOpen, onClose, onScanSuccess }: QRScannerModa
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-white/10 backdrop-blur-lg border border-white/20 text-white">
+      <DialogContent className="sm:max-w-md dialog-glow text-white">
         <DialogHeader>
           <DialogTitle className="text-white">Scan Ticket QR Code</DialogTitle>
         </DialogHeader>
