@@ -96,7 +96,10 @@ const ManageEvent = () => {
       showSuccess(`Ticket #${tokenId} checked in successfully!`);
       queryClient.invalidateQueries({ queryKey: ["attendees", address] });
     },
-    onError: (error: Error) => showError(error.message || "Check-in failed."),
+    onError: (error: any) => {
+      const message = error?.reason || error.message || "Check-in failed.";
+      showError(message);
+    },
   });
 
   const handleCheckInToggle = (tokenId: string, isCheckedIn: boolean) => {
@@ -105,9 +108,37 @@ const ManageEvent = () => {
     }
   };
 
-  const handleScanSuccess = (ticketId: string) => {
-    showSuccess(`Successfully scanned ticket: ${ticketId}. Attendee checked in.`);
-    setTimeout(() => setIsScannerOpen(false), 1500);
+  const handleScanSuccess = (decodedText: string) => {
+    setIsScannerOpen(false);
+    try {
+      const { eventId, ticketId } = JSON.parse(decodedText);
+
+      if (!eventId || !ticketId) {
+        throw new Error("Invalid QR code format.");
+      }
+
+      if (eventId.toLowerCase() !== address?.toLowerCase()) {
+        showError("This ticket is for a different event.");
+        return;
+      }
+
+      const attendee = attendees?.find(a => a.tokenId === ticketId);
+      if (!attendee) {
+        showError("This ticket is not valid for this event.");
+        return;
+      }
+
+      if (attendee.isCheckedIn) {
+        showError(`Ticket #${ticketId} has already been checked in.`);
+        return;
+      }
+
+      checkInMutation.mutate(ticketId);
+
+    } catch (error) {
+      showError("Invalid or unreadable QR code.");
+      console.error("QR parse error:", error);
+    }
   };
 
   if (isEventLoading) return <div>Loading...</div>;

@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
-import { Calendar, MapPin, QrCode } from "lucide-react";
+import { Calendar, MapPin } from "lucide-react";
 import { Ticket } from "@/data/tickets";
 import { Link } from "react-router-dom";
+import { QRCode } from "./QRCode";
 
 interface TicketCardProps {
   ticket: Ticket;
@@ -9,6 +10,11 @@ interface TicketCardProps {
 
 export const TicketCard = ({ ticket }: TicketCardProps) => {
   const { event } = ticket;
+  const qrCodeValue = JSON.stringify({
+    eventId: ticket.eventId,
+    ticketId: ticket.id,
+  });
+
   return (
     <Card className="card-glow overflow-hidden rounded-xl">
       <div className="flex flex-col sm:flex-row">
@@ -41,8 +47,8 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
         </div>
         <div className="flex items-center justify-center p-6 bg-white/5 border-t sm:border-t-0 sm:border-l border-white/10">
           <div className="flex flex-col items-center gap-2 text-center">
-            <QrCode className="w-20 h-20 text-white/60" />
-            <span className="text-xs text-white/60"># {ticket.id}</span>
+            <QRCode value={qrCodeValue} size={90} />
+            <span className="text-xs text-white/60 font-mono"># {ticket.id}</span>
           </div>
         </div>
       </div>
