@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Header } from "@/components/Header";
 import { EventCard } from "@/components/EventCard";
 import { Link } from "react-router-dom";
@@ -35,6 +36,35 @@ const Index = () => {
     queryFn: fetchEvents,
   });
 
+  const { upcomingEvents, pastEvents } = useMemo(() => {
+    if (!events) {
+      return { upcomingEvents: [], pastEvents: [] };
+    }
+
+    const upcoming: Event[] = [];
+    const past: Event[] = [];
+    const now = new Date();
+
+    events.forEach(event => {
+      const eventEndDate = event.endDate ? new Date(event.endDate) : new Date(event.startDate);
+      const [endHours, endMinutes] = event.endTime.split(':').map(Number);
+      
+      if (!isNaN(eventEndDate.getTime())) {
+        eventEndDate.setUTCHours(endHours, endMinutes);
+      }
+
+      const isEventOver = !isNaN(eventEndDate.getTime()) && eventEndDate < now;
+
+      if (isEventOver) {
+        past.push(event);
+      } else {
+        upcoming.push(event);
+      }
+    });
+
+    return { upcomingEvents: upcoming, pastEvents: past };
+  }, [events]);
+
   return (
     <motion.div
       initial="initial"
@@ -51,34 +81,66 @@ const Index = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-5xl font-bold mb-10 tracking-tight"
         >
-          Upcoming Events
+          Discover Events
         </motion.h1>
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10"
-        >
-          {isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
+        
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
+            {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="space-y-2">
                 <Skeleton className="h-48 w-full rounded-xl bg-white/10" />
                 <Skeleton className="h-4 w-3/4 bg-white/10" />
                 <Skeleton className="h-4 w-1/2 bg-white/10" />
               </div>
-            ))
-          ) : error ? (
-            <p className="text-center col-span-full text-red-400">Failed to load events.</p>
-          ) : (
-            events?.map((event) => (
-              <motion.div key={event.contractAddress} variants={itemVariants}>
-                <Link to={`/event/${event.contractAddress}`}>
-                  <EventCard event={event} />
-                </Link>
-              </motion.div>
-            ))
-          )}
-        </motion.div>
+            ))}
+          </div>
+        ) : error ? (
+          <p className="text-center col-span-full text-red-400">Failed to load events.</p>
+        ) : (
+          <>
+            <section className="mb-16">
+              <h2 className="text-3xl font-bold mb-6 tracking-tight">Upcoming</h2>
+              {upcomingEvents.length > 0 ? (
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10"
+                >
+                  {upcomingEvents.map((event) => (
+                    <motion.div key={event.contractAddress} variants={itemVariants}>
+                      <Link to={`/event/${event.contractAddress}`}>
+                        <EventCard event={event} />
+                      </Link>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              ) : (
+                <p className="text-white/70">No upcoming events found. Check back soon!</p>
+              )}
+            </section>
+
+            {pastEvents.length > 0 && (
+              <section>
+                <h2 className="text-3xl font-bold mb-6 tracking-tight">Past Events</h2>
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10"
+                >
+                  {pastEvents.map((event) => (
+                    <motion.div key={event.contractAddress} variants={itemVariants} className="opacity-60 hover:opacity-100 transition-opacity">
+                      <Link to={`/event/${event.contractAddress}`}>
+                        <EventCard event={event} />
+                      </Link>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </section>
+            )}
+          </>
+        )}
       </main>
     </motion.div>
   );
