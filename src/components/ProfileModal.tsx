@@ -7,10 +7,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Copy } from "lucide-react";
 import { showSuccess } from "@/utils/toast";
 import { useWeb3Store } from "@/store/web3Store";
+import { AddressAvatar } from "./AddressAvatar";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -32,24 +32,17 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] dialog-glow text-white">
         <DialogHeader>
-          <DialogTitle className="text-white">User Profile</DialogTitle>
-          <DialogDescription className="text-white/70">
+          <DialogTitle className="text-white text-center">User Profile</DialogTitle>
+          <DialogDescription className="text-white/70 text-center">
             Your connected account details.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16">
-              <AvatarFallback className="bg-amber-400 text-amber-950 font-bold text-2xl">
-                {account?.substring(2, 4).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-bold text-lg">Connected User</p>
-            </div>
+        <div className="grid gap-6 py-4">
+          <div className="flex justify-center">
+            {account && <AddressAvatar address={account} className="h-24 w-24" />}
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium leading-none text-white/80">
+            <label className="text-sm font-medium leading-none text-white/80 text-center block">
               Wallet Address
             </label>
             <div className="flex items-center justify-between rounded-md border border-white/20 bg-black/20 px-3 py-2">
@@ -70,7 +63,7 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
           <Button
             onClick={onClose}
             variant="outline"
-            className="bg-transparent border-white/30 hover:bg-white/10"
+            className="w-full bg-transparent border-white/30 hover:bg-white/10"
           >
             Close
           </Button>

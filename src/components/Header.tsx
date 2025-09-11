@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { Search, Bell, User, Wallet, LogOut } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +14,7 @@ import { showSuccess } from "@/utils/toast";
 import { ProfileModal } from "./ProfileModal";
 import { useWeb3Store } from "@/store/web3Store";
 import { ConnectWalletModal } from "./ConnectWalletModal";
+import { AddressAvatar } from "./AddressAvatar";
 
 export const Header = () => {
   const location = useLocation();
@@ -79,11 +79,7 @@ export const Header = () => {
                     variant="ghost"
                     className="relative h-8 w-8 rounded-full p-0"
                   >
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-amber-400 text-amber-950 font-bold">
-                        {account?.substring(2, 4).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+                    {account && <AddressAvatar address={account} className="h-8 w-8" />}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
