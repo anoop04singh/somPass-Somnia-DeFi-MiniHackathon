@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import { AnimatePresence } from "framer-motion";
 import { AlertProvider } from "./components/AlertProvider";
 import { CursorGlow } from "./components/CursorGlow";
+import { useWeb3Store } from "./store/web3Store";
 
 const queryClient = new QueryClient();
 
@@ -34,18 +36,24 @@ const AnimatedRoutes = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <CursorGlow />
-      <Toaster />
-      <Sonner />
-      <AlertProvider />
-      <BrowserRouter>
-        <AnimatedRoutes />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  useEffect(() => {
+    useWeb3Store.getState().init();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <CursorGlow />
+        <Toaster />
+        <Sonner />
+        <AlertProvider />
+        <BrowserRouter>
+          <AnimatedRoutes />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

@@ -11,14 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { showSuccess, showError } from "@/utils/toast";
+import { showSuccess } from "@/utils/toast";
 import { ProfileModal } from "./ProfileModal";
 import { useWeb3Store } from "@/store/web3Store";
+import { ConnectWalletModal } from "./ConnectWalletModal";
 
 export const Header = () => {
   const location = useLocation();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const { connectWallet, disconnectWallet, isConnected, account } = useWeb3Store();
+  const { disconnectWallet, isConnected, account, openConnectModal } = useWeb3Store();
 
   const navItems = [
     { href: "/", label: "Discover" },
@@ -26,15 +27,6 @@ export const Header = () => {
     { href: "/my-tickets", label: "My Tickets" },
     { href: "/dashboard", label: "Dashboard" },
   ];
-
-  const handleWalletConnect = async () => {
-    try {
-      await connectWallet();
-      showSuccess("Wallet connected successfully!");
-    } catch (error) {
-      showError("Failed to connect wallet.");
-    }
-  };
 
   return (
     <>
@@ -130,7 +122,7 @@ export const Header = () => {
               </DropdownMenu>
             ) : (
               <Button
-                onClick={handleWalletConnect}
+                onClick={openConnectModal}
                 className="bg-amber-400 text-amber-950 font-bold hover:bg-amber-500"
               >
                 <Wallet className="mr-2 h-4 w-4" />
@@ -144,6 +136,7 @@ export const Header = () => {
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
       />
+      <ConnectWalletModal />
     </>
   );
 };
