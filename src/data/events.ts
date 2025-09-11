@@ -6,7 +6,7 @@ export type EventMetadata = {
   startTime: string;
   endTime: string;
   location: string;
-  locationDetail: string;
+  locationDetail?: string;
   imageUrl: string;
   description: string;
   organizers: Organizer[];

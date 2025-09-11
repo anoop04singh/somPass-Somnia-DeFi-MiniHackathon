@@ -67,19 +67,26 @@ const CreateEvent = () => {
       await connectWallet();
       return;
     }
-    if (!imageFile || !organizerLogoFile) {
-      showError("Please upload both an event image and an organizer logo.");
-      return;
-    }
 
-    let toastId = showLoading("Uploading images...");
+    let toastId = showLoading("Processing event data...");
     try {
-      const [imageCID, logoCID] = await Promise.all([
-        uploadFileToIPFS(imageFile),
-        uploadFileToIPFS(organizerLogoFile),
-      ]);
-      const imageUrl = getIPFSUrl(imageCID);
-      const logoUrl = getIPFSUrl(logoCID);
+      // Use a placeholder if no image is provided
+      let imageUrl = "/placeholder.svg";
+      if (imageFile) {
+        dismissToast(toastId);
+        toastId = showLoading("Uploading event image...");
+        const imageCID = await uploadFileToIPFS(imageFile);
+        imageUrl = getIPFSUrl(imageCID);
+      }
+
+      // Use a placeholder if no logo is provided
+      let logoUrl = "/placeholder.svg";
+      if (organizerLogoFile) {
+        dismissToast(toastId);
+        toastId = showLoading("Uploading organizer logo...");
+        const logoCID = await uploadFileToIPFS(organizerLogoFile);
+        logoUrl = getIPFSUrl(logoCID);
+      }
 
       dismissToast(toastId);
       toastId = showLoading("Uploading event details...");
@@ -91,7 +98,7 @@ const CreateEvent = () => {
         startTime,
         endTime,
         location,
-        locationDetail: "Details to be added",
+        locationDetail: "",
         description,
         imageUrl,
         organizers: [{ name: organizerName, logoUrl: logoUrl }],

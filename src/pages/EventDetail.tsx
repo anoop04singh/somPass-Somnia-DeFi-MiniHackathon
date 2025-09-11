@@ -258,9 +258,11 @@ const EventDetail = () => {
                   </div>
                   <div>
                     <p className="font-semibold">{event.location}</p>
-                    <p className="text-white/60 text-sm">
-                      {event.locationDetail}
-                    </p>
+                    {event.locationDetail && (
+                      <p className="text-white/60 text-sm">
+                        {event.locationDetail}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
