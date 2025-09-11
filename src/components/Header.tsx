@@ -35,7 +35,7 @@ export const Header = () => {
           <div className="flex items-center gap-8">
             <Link
               to="/"
-              className="text-lg font-semibold tracking-tight text-amber-300 drop-shadow-[0_0_8px_rgba(252,211,77,0.5)] transition-all duration-300 hover:drop-shadow-[0_0_12px_rgba(252,211,77,0.8)]"
+              className="text-lg font-semibold tracking-tight text-amber-300 drop-shadow-[0_0_10px_rgba(252,211,77,0.7)] transition-all duration-300 hover:drop-shadow-[0_0_15px_rgba(252,211,77,0.9)]"
             >
               SomPass
             </Link>
@@ -77,7 +77,7 @@ export const Header = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="relative h-8 w-8 rounded-full p-0"
+                    className="relative h-8 w-8 p-0 rounded-full"
                   >
                     {account && <AddressAvatar address={account} className="h-8 w-8" />}
                   </Button>
