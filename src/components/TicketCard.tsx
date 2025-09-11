@@ -6,9 +6,10 @@ import { QRCode } from "./QRCode";
 
 interface TicketCardProps {
   ticket: Ticket;
+  onClick: () => void;
 }
 
-export const TicketCard = ({ ticket }: TicketCardProps) => {
+export const TicketCard = ({ ticket, onClick }: TicketCardProps) => {
   const { event } = ticket;
   const qrCodeValue = JSON.stringify({
     eventId: ticket.eventId,
@@ -16,7 +17,7 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
   });
 
   return (
-    <Card className="card-glow overflow-hidden rounded-xl">
+    <Card className="card-glow overflow-hidden rounded-xl cursor-pointer" onClick={onClick}>
       <div className="flex flex-col sm:flex-row">
         <img
           src={event.imageUrl}
@@ -26,14 +27,14 @@ export const TicketCard = ({ ticket }: TicketCardProps) => {
         <div className="flex flex-col justify-between p-6 flex-grow">
           <div>
             <h2 className="text-xl font-semibold mb-2 text-white">
-              <Link to={`/event/${event.contractAddress}`} className="hover:underline">
+              <Link to={`/event/${event.contractAddress}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
                 {event.title}
               </Link>
             </h2>
             <div className="space-y-2 text-sm text-white/80">
               <div className="flex items-center">
                 <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
-                <span>{`${new Date(event.date).toLocaleDateString("en-US", { month: 'long', day: 'numeric' })} at ${event.startTime}`}</span>
+                <span>{`${new Date(event.startDate).toLocaleDateString("en-US", { month: 'long', day: 'numeric' })} at ${event.startTime}`}</span>
               </div>
               <div className="flex items-center">
                 <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
