@@ -23,6 +23,7 @@ import { Event } from "@/data/events";
 import { useWeb3Store } from "@/store/web3Store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { querySubgraph, mapSubgraphEventToEvent, SubgraphEvent } from "@/lib/subgraph";
+import { Badge } from "@/components/ui/badge";
 
 const fetchEventDetail = async (address: string): Promise<Event | null> => {
   if (!address) return null;
@@ -296,6 +297,19 @@ const EventDetail = () => {
                 </h2>
                 <p className="text-white/80">{event.description}</p>
               </div>
+
+              {event.tags && event.tags.length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-xl font-semibold mb-3">Tags</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {event.tags.map((tag) => (
+                      <Badge key={tag} variant="secondary" className="bg-amber-400/10 text-amber-300 border-amber-400/20 text-sm px-3 py-1">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
