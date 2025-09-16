@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { Search, Bell, User, Wallet, LogOut } from "lucide-react";
+import { Bell, User, Wallet, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +15,7 @@ import { ProfileModal } from "./ProfileModal";
 import { useWeb3Store } from "@/store/web3Store";
 import { ConnectWalletModal } from "./ConnectWalletModal";
 import { AddressAvatar } from "./AddressAvatar";
+import { AISearch } from "./AISearch";
 
 export const Header = () => {
   const location = useLocation();
@@ -56,14 +57,7 @@ export const Header = () => {
             </nav>
           </div>
           <div className="flex items-center gap-4 md:gap-6">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="opacity-70 hover:opacity-100 transition-opacity"
-              onClick={() => showSuccess("Search feature coming soon!")}
-            >
-              <Search size={18} />
-            </Button>
+            <AISearch />
             <Button
               variant="ghost"
               size="icon"
