@@ -94,8 +94,8 @@ export const AISearch = () => {
 
   return (
     <>
-      <form onSubmit={handleSearch} className="relative w-full max-w-xs">
-        <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-fuchsia-500 via-red-500 to-amber-500 blur-sm opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+      <form onSubmit={handleSearch} className="relative w-full max-w-xs group">
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
         <div className="relative flex items-center">
           <Sparkles className="absolute left-3 h-5 w-5 text-white/50" />
           <Input
@@ -103,9 +103,9 @@ export const AISearch = () => {
             placeholder="Ask AI to find events..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-10 pr-20 bg-black/50 border-white/20 rounded-full focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-amber-400"
+            className="w-full pl-10 pr-20 bg-black/30 border-white/10 rounded-full focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-pink-400 backdrop-blur-sm"
           />
-          <Button type="submit" size="sm" className="absolute right-1.5 h-7 rounded-full bg-gradient-to-r from-fuchsia-500 to-amber-500 text-white font-semibold" disabled={isLoading}>
+          <Button type="submit" size="sm" className="absolute right-1.5 h-7 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 text-white font-semibold hover:opacity-90 transition-opacity" disabled={isLoading}>
             {isLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : "Find"}
           </Button>
         </div>
