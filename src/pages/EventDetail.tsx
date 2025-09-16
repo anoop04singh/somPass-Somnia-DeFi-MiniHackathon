@@ -24,6 +24,7 @@ import { useWeb3Store } from "@/store/web3Store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { querySubgraph, mapSubgraphEventToEvent, SubgraphEvent } from "@/lib/subgraph";
 import { Badge } from "@/components/ui/badge";
+import ReactMarkdown from "react-markdown";
 
 const fetchEventDetail = async (address: string): Promise<Event | null> => {
   if (!address) return null;
@@ -291,11 +292,11 @@ const EventDetail = () => {
                 </CardContent>
               </Card>
 
-              <div className="prose prose-invert max-w-none">
+              <div className="prose prose-invert max-w-none text-white/80">
                 <h2 className="text-2xl font-semibold mb-4">
                   About this event
                 </h2>
-                <p className="text-white/80">{event.description}</p>
+                <ReactMarkdown>{event.description}</ReactMarkdown>
               </div>
 
               {event.tags && event.tags.length > 0 && (

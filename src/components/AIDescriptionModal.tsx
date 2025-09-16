@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { LoaderCircle, Wand2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ReactMarkdown from "react-markdown";
 
 interface AIDescriptionModalProps {
   isOpen: boolean;
@@ -53,7 +54,9 @@ export const AIDescriptionModal = ({ isOpen, onClose, originalText, generatedTex
                   <LoaderCircle className="w-8 h-8 animate-spin text-amber-400" />
                 </div>
               ) : (
-                <p className="text-sm whitespace-pre-wrap">{generatedText}</p>
+                <div className="prose prose-sm prose-invert max-w-none">
+                  <ReactMarkdown>{generatedText}</ReactMarkdown>
+                </div>
               )}
             </ScrollArea>
           </div>
