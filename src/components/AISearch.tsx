@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sparkles, LoaderCircle } from "lucide-react";
@@ -26,20 +26,50 @@ const fetchEventsForSearch = async (): Promise<Event[]> => {
   return Promise.all(response.events.map(mapSubgraphEventToEvent));
 };
 
+const SUGGESTIONS = [
+  "Web3 conferences in Europe",
+  "Music festivals this summer",
+  "Tech meetups near me",
+  "Art exhibitions in New York",
+  "Gaming tournaments",
+  "Food and drink festivals",
+];
+
 export const AISearch = () => {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<Event[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [suggestion, setSuggestion] = useState(SUGGESTIONS[0]);
+  const intervalRef = useRef<number | null>(null);
 
   const { data: events } = useQuery({
     queryKey: ["events"],
     queryFn: fetchEventsForSearch,
   });
 
+  useEffect(() => {
+    if (isFocused) {
+      intervalRef.current = window.setInterval(() => {
+        setSuggestion(prev => {
+          const currentIndex = SUGGESTIONS.indexOf(prev);
+          const nextIndex = (currentIndex + 1) % SUGGESTIONS.length;
+          return SUGGESTIONS[nextIndex];
+        });
+      }, 2000);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isFocused]);
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim() || !events) return;
+    const searchQuery = query.trim() || suggestion;
+    if (!searchQuery || !events) return;
     if (!import.meta.env.VITE_GEMINI_API_KEY) {
       showError("Gemini API key is not configured.");
       return;
@@ -64,7 +94,7 @@ export const AISearch = () => {
         Here is the list of available upcoming events:
         ${JSON.stringify(formattedEvents)}
 
-        User's query: "${query}"
+        User's query: "${searchQuery}"
 
         JSON array of matching contract addresses:
       `;
@@ -99,10 +129,12 @@ export const AISearch = () => {
           <Sparkles className="absolute left-3 h-5 w-5 text-white/50" />
           <Input
             type="search"
-            placeholder="AI powered search"
+            placeholder={isFocused ? suggestion : "AI powered search"}
             value={query}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-10 pr-20 bg-black/30 border-0 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0 backdrop-blur-sm text-white [text-shadow:0_0_6px_rgba(255,255,255,0.7)] placeholder:text-white/60"
+            className="w-full pl-10 pr-20 bg-black/30 border-0 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0 backdrop-blur-sm text-white [text-shadow:0_0_6px_rgba(255,255,255,0.7)] placeholder:text-white/60 transition-all duration-300"
           />
           <Button type="submit" size="sm" className="absolute right-1.5 h-7 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 text-white font-semibold hover:opacity-90 transition-opacity" disabled={isLoading}>
             {isLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : "Find"}
@@ -113,7 +145,7 @@ export const AISearch = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         results={results}
-        query={query}
+        query={query.trim() || suggestion}
       />
     </>
   );
