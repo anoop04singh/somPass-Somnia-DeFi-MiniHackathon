@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { motion } from "framer-motion";
 import { pageTransition, containerVariants, itemVariants } from "@/lib/animations";
@@ -14,6 +14,7 @@ import { QRScannerModal } from "@/components/QRScannerModal";
 import { ethers } from "ethers";
 import { EVENT_ABI } from "@/lib/constants";
 import { showSuccess, showError } from "@/utils/toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const fetchOrganizerEvents = async (account: string | null): Promise<Event[]> => {
   if (!account) return [];
@@ -44,23 +45,52 @@ const Dashboard = () => {
     enabled: isConnected && !!account,
   });
 
+  const { upcomingEvents, ongoingEvents, pastEvents } = useMemo(() => {
+    if (!organizerEvents) {
+      return { upcomingEvents: [], ongoingEvents: [], pastEvents: [] };
+    }
+    const upcoming: Event[] = [];
+    const ongoing: Event[] = [];
+    const past: Event[] = [];
+    const now = new Date();
+
+    organizerEvents.forEach(event => {
+      const eventStartDate = new Date(event.startDate);
+      const [startHours, startMinutes] = event.startTime.split(':').map(Number);
+      if (!isNaN(eventStartDate.getTime())) {
+        eventStartDate.setUTCHours(startHours, startMinutes);
+      }
+
+      const eventEndDate = event.endDate ? new Date(event.endDate) : new Date(event.startDate);
+      const [endHours, endMinutes] = event.endTime.split(':').map(Number);
+      if (!isNaN(eventEndDate.getTime())) {
+        eventEndDate.setUTCHours(endHours, endMinutes);
+      }
+
+      if (isNaN(eventEndDate.getTime()) || now > eventEndDate) {
+        past.push(event);
+      } else if (now < eventStartDate) {
+        upcoming.push(event);
+      } else {
+        ongoing.push(event);
+      }
+    });
+
+    return { upcomingEvents: upcoming, ongoingEvents: ongoing, pastEvents: past };
+  }, [organizerEvents]);
+
   const checkInMutation = useMutation({
     mutationFn: async ({ eventId, ticketId }: { eventId: string, ticketId: string }) => {
       if (!signer || !account) throw new Error("Wallet not connected.");
-
-      // 1. Verify organizer permission from the subgraph
       const eventDetailsQuery = `
         query GetEventOrganizer($id: ID!) {
           event(id: $id) { organizer }
         }
       `;
       const eventResponse = await querySubgraph<{ event: { organizer: string } | null }>(eventDetailsQuery, { id: eventId.toLowerCase() });
-
       if (!eventResponse.event || eventResponse.event.organizer.toLowerCase() !== account.toLowerCase()) {
         throw new Error("You are not authorized for this event.");
       }
-
-      // 2. Check if ticket is already checked in
       const fullTicketId = `${eventId.toLowerCase()}-${ticketId}`;
       const ticketQuery = `
         query GetTicketStatus($ticketId: ID!) {
@@ -68,12 +98,9 @@ const Dashboard = () => {
         }
       `;
       const ticketResponse = await querySubgraph<{ ticket: { isCheckedIn: boolean } | null }>(ticketQuery, { ticketId: fullTicketId });
-
       if (ticketResponse.ticket?.isCheckedIn) {
         throw new Error(`Ticket #${ticketId} has already been checked in.`);
       }
-
-      // 3. Perform the check-in transaction
       const eventContract = new ethers.Contract(eventId, EVENT_ABI, signer);
       const tx = await eventContract.checkIn(ticketId);
       await tx.wait();
@@ -98,6 +125,26 @@ const Dashboard = () => {
     } catch (error) {
       showError("Invalid or unreadable QR code.");
     }
+  };
+
+  const renderEventList = (events: Event[], emptyMessage: string) => {
+    if (events.length === 0) {
+      return <p className="text-center text-white/70 py-12">{emptyMessage}</p>;
+    }
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"
+      >
+        {events.map((event) => (
+          <motion.div key={event.contractAddress} variants={itemVariants}>
+            <DashboardEventCard event={event} />
+          </motion.div>
+        ))}
+      </motion.div>
+    );
   };
 
   return (
@@ -133,23 +180,27 @@ const Dashboard = () => {
             </div>
           ) : isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-48 w-full rounded-xl bg-white/10" />)}
+              {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-48 w-full rounded-xl bg-white/10" />)}
             </div>
           ) : organizerEvents && organizerEvents.length > 0 ? (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              {organizerEvents.map((event) => (
-                <motion.div key={event.contractAddress} variants={itemVariants}>
-                  <DashboardEventCard event={event} />
-                </motion.div>
-              ))}
-            </motion.div>
+            <Tabs defaultValue="upcoming" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 bg-white/5 border border-white/10 h-12">
+                <TabsTrigger value="upcoming" className="text-base">Upcoming</TabsTrigger>
+                <TabsTrigger value="ongoing" className="text-base">Ongoing</TabsTrigger>
+                <TabsTrigger value="ended" className="text-base">Ended</TabsTrigger>
+              </TabsList>
+              <TabsContent value="upcoming">
+                {renderEventList(upcomingEvents, "You have no upcoming events.")}
+              </TabsContent>
+              <TabsContent value="ongoing">
+                {renderEventList(ongoingEvents, "You have no ongoing events.")}
+              </TabsContent>
+              <TabsContent value="ended">
+                {renderEventList(pastEvents, "You have no past events.")}
+              </TabsContent>
+            </Tabs>
           ) : (
-            <p className="text-center text-white/70">You have not created any events yet.</p>
+            <p className="text-center text-white/70 py-12">You have not created any events yet.</p>
           )}
         </main>
       </motion.div>
