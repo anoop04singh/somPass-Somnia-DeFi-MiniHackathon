@@ -94,16 +94,15 @@ export const AISearch = () => {
 
   return (
     <>
-      <form onSubmit={handleSearch} className="relative w-full max-w-xs group">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
+      <form onSubmit={handleSearch} className="relative w-full max-w-xs">
         <div className="relative flex items-center">
           <Sparkles className="absolute left-3 h-5 w-5 text-white/50" />
           <Input
             type="search"
-            placeholder="Ask AI to find events..."
+            placeholder="AI powered search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-10 pr-20 bg-black/30 border-white/10 rounded-full focus-visible:ring-offset-0 focus-visible:ring-2 focus-visible:ring-pink-400 backdrop-blur-sm"
+            className="w-full pl-10 pr-20 bg-black/30 border-0 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0 backdrop-blur-sm text-white [text-shadow:0_0_6px_rgba(255,255,255,0.7)] placeholder:text-white/60"
           />
           <Button type="submit" size="sm" className="absolute right-1.5 h-7 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 text-white font-semibold hover:opacity-90 transition-opacity" disabled={isLoading}>
             {isLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : "Find"}
