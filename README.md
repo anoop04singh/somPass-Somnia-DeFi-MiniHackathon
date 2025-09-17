@@ -1,7 +1,6 @@
 # SomPass: Decentralized Event Ticketing Platform
 
-**SomPass** Deployment ready, Efficient and Scalable Event Ticketing Platform on Somnia Network.
----
+**Sompass**, deployment ready, Efficient and Scalable Event Ticketing Platform on Somnia Network.
 
 ## Table of Contents
 
