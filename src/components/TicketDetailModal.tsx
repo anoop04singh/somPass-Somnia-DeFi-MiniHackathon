@@ -9,15 +9,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Ticket } from "@/data/tickets";
 import { QRCode } from "./QRCode";
-import { Calendar, MapPin } from "lucide-react";
+import { Calendar, MapPin, Send } from "lucide-react";
 
 interface TicketDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   ticket: Ticket | null;
+  onTransferClick: (ticket: Ticket) => void;
 }
 
-export const TicketDetailModal = ({ isOpen, onClose, ticket }: TicketDetailModalProps) => {
+export const TicketDetailModal = ({ isOpen, onClose, ticket, onTransferClick }: TicketDetailModalProps) => {
   if (!ticket) return null;
 
   const { event } = ticket;
@@ -25,6 +26,10 @@ export const TicketDetailModal = ({ isOpen, onClose, ticket }: TicketDetailModal
     eventId: ticket.eventId,
     ticketId: ticket.id,
   });
+
+  const handleTransfer = () => {
+    onTransferClick(ticket);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -54,11 +59,18 @@ export const TicketDetailModal = ({ isOpen, onClose, ticket }: TicketDetailModal
             </div>
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="grid grid-cols-2 gap-2">
           <Button
-            onClick={onClose}
+            onClick={handleTransfer}
             variant="outline"
             className="w-full bg-transparent border-white/30 hover:bg-white/10"
+          >
+            <Send className="w-4 h-4 mr-2" />
+            Transfer Ticket
+          </Button>
+          <Button
+            onClick={onClose}
+            className="w-full bg-amber-400 text-amber-950 hover:bg-amber-500"
           >
             Close
           </Button>

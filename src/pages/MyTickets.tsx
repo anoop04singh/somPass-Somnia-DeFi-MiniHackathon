@@ -16,6 +16,7 @@ import { Ticket } from "@/data/tickets";
 import { Skeleton } from "@/components/ui/skeleton";
 import { querySubgraph, mapSubgraphEventToEvent, SubgraphEvent } from "@/lib/subgraph";
 import { TicketDetailModal } from "@/components/TicketDetailModal";
+import { TransferTicketModal } from "@/components/TransferTicketModal";
 
 interface SubgraphTicket {
   id: string;
@@ -65,17 +66,31 @@ const MyTickets = () => {
     enabled: isConnected && !!account,
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [ticketToTransfer, setTicketToTransfer] = useState<Ticket | null>(null);
 
   const handleTicketClick = (ticket: Ticket) => {
     setSelectedTicket(ticket);
-    setIsModalOpen(true);
+    setIsDetailModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
     setSelectedTicket(null);
+  };
+
+  const handleOpenTransferModal = (ticket: Ticket) => {
+    setTicketToTransfer(ticket);
+    setIsDetailModalOpen(false); // Close detail modal
+    setIsTransferModalOpen(true);
+  };
+
+  const handleCloseTransferModal = () => {
+    setIsTransferModalOpen(false);
+    setTicketToTransfer(null);
   };
 
   return (
@@ -138,9 +153,15 @@ const MyTickets = () => {
         </main>
       </motion.div>
       <TicketDetailModal 
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        isOpen={isDetailModalOpen}
+        onClose={handleCloseDetailModal}
         ticket={selectedTicket}
+        onTransferClick={handleOpenTransferModal}
+      />
+      <TransferTicketModal
+        isOpen={isTransferModalOpen}
+        onClose={handleCloseTransferModal}
+        ticket={ticketToTransfer}
       />
     </>
   );
