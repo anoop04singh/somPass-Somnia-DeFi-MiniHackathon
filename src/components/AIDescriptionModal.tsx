@@ -54,7 +54,7 @@ export const AIDescriptionModal = ({ isOpen, onClose, originalText, generatedTex
                   <LoaderCircle className="w-8 h-8 animate-spin text-amber-400" />
                 </div>
               ) : (
-                <div className="prose prose-sm prose-invert max-w-none">
+                <div className="prose prose-sm prose-invert max-w-none break-words">
                   <ReactMarkdown>{generatedText}</ReactMarkdown>
                 </div>
               )}
