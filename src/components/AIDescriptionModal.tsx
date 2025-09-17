@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { LoaderCircle, Wand2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ReactMarkdown from "react-markdown";
 
 interface AIDescriptionModalProps {
   isOpen: boolean;
@@ -41,31 +42,27 @@ export const AIDescriptionModal = ({ isOpen, onClose, originalText, generatedTex
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow min-h-0">
           <div className="flex flex-col">
             <h3 className="font-semibold mb-2">Your Text</h3>
-            <div className="relative flex-grow">
-              <ScrollArea className="absolute inset-0 bg-black/20 rounded-md p-4 border border-white/10">
-                <p className="text-sm whitespace-pre-wrap">{originalText || "You haven't written anything yet."}</p>
-              </ScrollArea>
-            </div>
+            <ScrollArea className="bg-black/20 rounded-md p-4 border border-white/10 flex-1">
+              <p className="text-sm whitespace-pre-wrap">{originalText || "You haven't written anything yet."}</p>
+            </ScrollArea>
           </div>
           <div className="flex flex-col">
             <h3 className="font-semibold mb-2">AI Enhanced</h3>
-            <div className="relative flex-grow">
-              <ScrollArea className="absolute inset-0 bg-black/20 rounded-md p-4 border border-amber-400/30">
-                {isLoading ? (
-                  <div className="flex items-center justify-center h-full">
-                    <LoaderCircle className="w-8 h-8 animate-spin text-amber-400" />
-                  </div>
-                ) : (
-                  <p className="text-sm whitespace-pre-wrap break-words">
-                    {generatedText}
-                  </p>
-                )}
-              </ScrollArea>
-            </div>
+            <ScrollArea className="bg-black/20 rounded-md p-4 border border-amber-400/30 flex-1">
+              {isLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <LoaderCircle className="w-8 h-8 animate-spin text-amber-400" />
+                </div>
+              ) : (
+                <div className="prose prose-sm prose-invert max-w-none break-words">
+                  <ReactMarkdown>{generatedText}</ReactMarkdown>
+                </div>
+              )}
+            </ScrollArea>
           </div>
         </div>
 
-        <DialogFooter className="pt-4">
+        <DialogFooter className="pt-4 flex-shrink-0">
           <Button onClick={onClose} variant="outline" className="bg-transparent border-white/30 hover:bg-white/10">
             Cancel
           </Button>
