@@ -72,12 +72,13 @@ export const Header = () => {
             {isConnected ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
+<Button
   variant="ghost"
   className="relative h-8 w-8 p-0 rounded-full overflow-hidden"
 >
-  {account && <AddressAvatar address={account} className="h-full w-full object-cover rounded-full" />}
+  {account && <AddressAvatar address={account} />}
 </Button>
+
 
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
