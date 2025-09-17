@@ -162,7 +162,13 @@ export const AISearch = () => {
             onChange={(e) => setQuery(e.target.value)}
             className="w-full pl-10 pr-20 bg-black/30 border-0 rounded-full focus-visible:ring-0 focus-visible:ring-offset-0 backdrop-blur-sm text-white [text-shadow:0_0_6px_rgba(255,255,255,0.7)] placeholder:text-white/60 transition-all duration-300"
           />
-          <Button type="submit" size="sm" className="absolute right-1.5 h-7 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 text-white font-semibold hover:opacity-90 transition-opacity" disabled={isLoading}>
+          <Button
+            type="submit"
+            size="sm"
+            variant="ghost"
+            className="absolute right-1.5 h-7 px-4 rounded-full text-amber-300 font-semibold drop-shadow-[0_0_8px_rgba(252,211,77,0.6)] hover:bg-transparent hover:text-amber-200 hover:drop-shadow-[0_0_12px_rgba(252,211,77,0.8)] transition-all duration-300"
+            disabled={isLoading}
+          >
             {isLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : "Find"}
           </Button>
         </div>
