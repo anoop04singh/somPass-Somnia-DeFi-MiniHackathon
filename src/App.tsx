@@ -15,6 +15,7 @@ import { AnimatePresence } from "framer-motion";
 import { AlertProvider } from "./components/AlertProvider";
 import { CursorGlow } from "./components/CursorGlow";
 import { useWeb3Store } from "./store/web3Store";
+import PastEvents from "./pages/PastEvents";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const AnimatedRoutes = () => {
         <Route path="/my-tickets" element={<MyTickets />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dashboard/event/:address" element={<ManageEvent />} />
+        <Route path="/past-events" element={<PastEvents />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

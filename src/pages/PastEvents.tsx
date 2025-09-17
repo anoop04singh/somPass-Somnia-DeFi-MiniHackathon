@@ -30,18 +30,18 @@ const fetchEvents = async (): Promise<Event[]> => {
   return Promise.all(response.events.map(mapSubgraphEventToEvent));
 };
 
-const Index = () => {
+const PastEvents = () => {
   const { data: events, isLoading, error } = useQuery({
     queryKey: ["events"],
     queryFn: fetchEvents,
   });
 
-  const upcomingEvents = useMemo(() => {
+  const pastEvents = useMemo(() => {
     if (!events) {
       return [];
     }
 
-    const upcoming: Event[] = [];
+    const past: Event[] = [];
     const now = new Date();
 
     events.forEach(event => {
@@ -54,12 +54,12 @@ const Index = () => {
 
       const isEventOver = !isNaN(eventEndDate.getTime()) && eventEndDate < now;
 
-      if (!isEventOver) {
-        upcoming.push(event);
+      if (isEventOver) {
+        past.push(event);
       }
     });
 
-    return upcoming;
+    return past;
   }, [events]);
 
   return (
@@ -78,7 +78,7 @@ const Index = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-4xl sm:text-5xl font-bold mb-10 tracking-tight"
         >
-          Discover Events
+          Past Events
         </motion.h1>
         
         {isLoading ? (
@@ -95,16 +95,15 @@ const Index = () => {
           <p className="text-center col-span-full text-red-400">Failed to load events.</p>
         ) : (
           <section>
-            <h2 className="text-3xl font-bold mb-6 tracking-tight">Upcoming</h2>
-            {upcomingEvents.length > 0 ? (
+            {pastEvents.length > 0 ? (
               <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10"
               >
-                {upcomingEvents.map((event) => (
-                  <motion.div key={event.contractAddress} variants={itemVariants}>
+                {pastEvents.map((event) => (
+                  <motion.div key={event.contractAddress} variants={itemVariants} className="opacity-60 hover:opacity-100 transition-opacity">
                     <Link to={`/event/${event.contractAddress}`}>
                       <EventCard event={event} />
                     </Link>
@@ -112,7 +111,7 @@ const Index = () => {
                 ))}
               </motion.div>
             ) : (
-              <p className="text-white/70">No upcoming events found. Check back soon!</p>
+              <p className="text-white/70">No past events found.</p>
             )}
           </section>
         )}
@@ -121,4 +120,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default PastEvents;

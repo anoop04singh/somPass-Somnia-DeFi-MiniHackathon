@@ -25,6 +25,7 @@ export const Header = () => {
 
   const navItems = [
     { href: "/", label: "Discover" },
+    { href: "/past-events", label: "Past Events" },
     { href: "/create", label: "Create Event" },
     { href: "/my-tickets", label: "My Tickets" },
     { href: "/dashboard", label: "Dashboard" },
@@ -72,12 +73,12 @@ export const Header = () => {
             {isConnected ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 p-0 rounded-full overflow-hidden"
-                  >
-                    {account && <AddressAvatar address={account} />}
-                  </Button>
+<Button
+  variant="ghost"
+  className="relative h-8 w-8 p-0 rounded-full overflow-hidden"
+>
+  {account && <AddressAvatar address={account} />}
+</Button>
 
 
                 </DropdownMenuTrigger>
