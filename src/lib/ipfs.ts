@@ -58,5 +58,5 @@ export const uploadMetadataToIPFS = async (metadata: EventMetadata): Promise<str
 };
 
 export const getIPFSUrl = (cid: string) => {
-  return `https://gateway.pinata.cloud/ipfs/${cid}`;
+  return `https://ipfs.io/ipfs/${cid}`;
 };
