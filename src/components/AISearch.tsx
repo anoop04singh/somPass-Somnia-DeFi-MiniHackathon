@@ -102,11 +102,15 @@ export const AISearch = () => {
         JSON array of matching contract addresses:
       `;
 
+      console.log("Sending the following context to the AI model:", prompt);
+
       const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const result = await model.generateContent(prompt);
       const responseText = result.response.text();
       
+      console.log("Received the following raw data from the AI model:", responseText);
+
       // Robustly find and parse the JSON array from the response
       const startIndex = responseText.indexOf('[');
       const endIndex = responseText.lastIndexOf(']');
