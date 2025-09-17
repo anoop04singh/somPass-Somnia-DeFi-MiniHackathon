@@ -83,12 +83,13 @@ export const AISearch = () => {
         title: event.title,
         description: event.description,
         location: event.location,
+        tags: event.tags || [],
       }));
 
       const prompt = `
         You are an intelligent event search assistant for a platform called SomPass.
         Your task is to find relevant events from a provided list based on a user's query.
-        Analyze the user's query and the event data (title, description, location).
+        Analyze the user's query and the event data (title, description, location, and tags).
         Return ONLY a JSON array of strings, where each string is the 'contractAddress' of a matching event. Do not include any other text, explanations, or markdown formatting.
 
         Here is the list of available upcoming events:
