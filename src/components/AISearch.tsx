@@ -76,6 +76,8 @@ export const AISearch = () => {
     }
 
     setIsLoading(true);
+    setResults([]); // Reset previous results
+
     try {
       const upcomingEvents = events.filter(event => new Date(event.startDate) >= new Date());
       const formattedEvents = upcomingEvents.map(event => ({
@@ -90,7 +92,7 @@ export const AISearch = () => {
         You are an intelligent event search assistant for a platform called SomPass.
         Your task is to find relevant events from a provided list based on a user's query.
         Analyze the user's query and the event data (title, description, location, and tags).
-        Return ONLY a JSON array of strings, where each string is the 'contractAddress' of a matching event. Do not include any other text, explanations, or markdown formatting.
+        Return ONLY a JSON array of strings, where each string is the 'contractAddress' of a matching event. Do not include any other text, explanations, or markdown formatting. If no events match, return an empty array [].
 
         Here is the list of available upcoming events:
         ${JSON.stringify(formattedEvents)}
@@ -103,23 +105,31 @@ export const AISearch = () => {
       const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const result = await model.generateContent(prompt);
-      let responseText = result.response.text();
+      const responseText = result.response.text();
       
-      if (responseText.startsWith("```json")) {
-        responseText = responseText.substring(7, responseText.length - 3).trim();
-      }
+      // Robustly find and parse the JSON array from the response
+      const startIndex = responseText.indexOf('[');
+      const endIndex = responseText.lastIndexOf(']');
 
-      const resultIds = JSON.parse(responseText) as string[];
-      const matchingEvents = upcomingEvents.filter(event => resultIds.includes(event.contractAddress));
-      
-      setResults(matchingEvents);
-      setIsModalOpen(true);
+      if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+        const jsonString = responseText.substring(startIndex, endIndex + 1);
+        const resultIds = JSON.parse(jsonString) as string[];
+        const matchingEvents = upcomingEvents.filter(event => 
+          resultIds.some(id => id.toLowerCase() === event.contractAddress.toLowerCase())
+        );
+        setResults(matchingEvents);
+      } else {
+        console.warn("AI response did not contain a valid JSON array.", responseText);
+        setResults([]);
+      }
 
     } catch (error) {
       console.error("AI search failed:", error);
       showError("AI search failed. Please try again.");
+      setResults([]);
     } finally {
       setIsLoading(false);
+      setIsModalOpen(true);
     }
   };
 
