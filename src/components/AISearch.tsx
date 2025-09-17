@@ -79,7 +79,19 @@ export const AISearch = () => {
     setResults([]); // Reset previous results
 
     try {
-      const upcomingEvents = events.filter(event => new Date(event.startDate) >= new Date());
+      const now = new Date();
+      const upcomingEvents = events.filter(event => {
+        const eventEndDate = event.endDate ? new Date(event.endDate) : new Date(event.startDate);
+        const [endHours, endMinutes] = event.endTime.split(':').map(Number);
+        
+        if (!isNaN(eventEndDate.getTime())) {
+          eventEndDate.setUTCHours(endHours, endMinutes);
+        }
+  
+        const isEventOver = !isNaN(eventEndDate.getTime()) && eventEndDate < now;
+        return !isEventOver;
+      });
+
       const formattedEvents = upcomingEvents.map(event => ({
         contractAddress: event.contractAddress,
         title: event.title,
