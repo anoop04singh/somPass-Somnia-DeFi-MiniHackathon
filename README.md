@@ -1,9 +1,6 @@
 # SomPass: Decentralized Event Ticketing Platform
 
-![SomPass](public/SompassLogoRemovebg.png)
-
-**SomPass** is a cutting-edge, fully decentralized event ticketing platform built on the **Somnia network**. It leverages blockchain technology, NFTs, and decentralized storage to create a transparent, secure, and efficient ecosystem for event organizers and attendees.
-
+**SomPass** Deployment ready, Efficient and Scalable Event Ticketing Platform on Somnia Network.
 ---
 
 ## Table of Contents
