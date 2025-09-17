@@ -73,11 +73,12 @@ export const Header = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 p-0 rounded-full"
-                  >
-                    {account && <AddressAvatar address={account} className="h-8 w-8" />}
-                  </Button>
+  variant="ghost"
+  className="relative h-8 w-8 p-0 rounded-full overflow-hidden"
+>
+  {account && <AddressAvatar address={account} className="h-full w-full object-cover rounded-full" />}
+</Button>
+
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   className="w-56 dialog-glow text-white"
