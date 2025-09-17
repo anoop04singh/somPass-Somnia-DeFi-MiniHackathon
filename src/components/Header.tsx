@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { Bell, User, Wallet, LogOut } from "lucide-react";
+import { Bell, User, Wallet, LogOut, Menu } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { showSuccess } from "@/utils/toast";
 import { ProfileModal } from "./ProfileModal";
 import { useWeb3Store } from "@/store/web3Store";
@@ -56,8 +57,10 @@ export const Header = () => {
               ))}
             </nav>
           </div>
-          <div className="flex items-center gap-4 md:gap-6">
-            <AISearch />
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="hidden md:block">
+              <AISearch />
+            </div>
             <Button
               variant="ghost"
               size="icon"
@@ -113,12 +116,33 @@ export const Header = () => {
             ) : (
               <Button
                 onClick={openConnectModal}
-                className="bg-amber-400 text-amber-950 font-bold hover:bg-amber-500"
+                className="bg-amber-400 text-amber-950 font-bold hover:bg-amber-500 hidden sm:flex"
               >
                 <Wallet className="mr-2 h-4 w-4" />
                 Connect Wallet
               </Button>
             )}
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="dialog-glow text-white w-[250px] sm:w-[300px]">
+                  <nav className="flex flex-col gap-6 text-lg mt-8">
+                    {navItems.map((item) => (
+                      <SheetClose asChild key={item.href}>
+                        <Link to={item.href} className="py-2 hover:text-amber-300 transition-colors">{item.label}</Link>
+                      </SheetClose>
+                    ))}
+                  </nav>
+                  <div className="mt-8">
+                    <AISearch />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </header>

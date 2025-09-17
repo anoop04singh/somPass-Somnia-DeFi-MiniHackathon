@@ -240,7 +240,7 @@ const EventDetail = () => {
             </div>
 
             <div className="lg:col-span-2">
-              <h1 className="text-5xl font-bold tracking-tight mb-6">
+              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-6">
                 {event.title}
               </h1>
 
