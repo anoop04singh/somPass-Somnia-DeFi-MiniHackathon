@@ -1,9 +1,19 @@
 # SomPass: Decentralized Event Ticketing Platform
 
-**Sompass**, deployment ready, Efficient and Scalable Event Ticketing Platform on Somnia Network.
+**SomPass** is a cutting-edge, fully decentralized event ticketing platform built on the **Somnia network**. It leverages blockchain technology, NFTs, and decentralized storage to create a transparent, secure, and efficient ecosystem for event organizers and attendees.
+
+---
+
+## Documentation
+
+*   **User Guide**: [SomPass Event Ticketing Platform - User Guide](https://medium.com/@singanoop04/sompass-event-ticketing-platform-user-guide-80144dd0562a)
+*   **Technical Blueprint**: [SomPass Technical Blueprint](https://medium.com/@singanoop04/sompass-technical-blueprint-209b8327f023)
+
+---
 
 ## Table of Contents
 
+- [Documentation](#documentation)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Application Architecture & Workflow](#application-architecture--workflow)
@@ -28,17 +38,17 @@
 
 ### For Attendees
 
-- **Discover Events**: Browse a rich catalog of upcoming and past events.
-- **Connect Wallet**: Seamlessly connect any EVM-compatible wallet (e.g., MetaMask).
-- **Purchase NFT Tickets**: Buy event tickets as unique NFTs, ensuring true ownership.
-- **Manage Tickets**: View all your tickets in one place, each with a unique QR code for entry.
+-   **Discover Events**: Browse a rich catalog of upcoming and past events.
+-   **Connect Wallet**: Seamlessly connect any EVM-compatible wallet (e.g., MetaMask).
+-   **Purchase NFT Tickets**: Buy event tickets as unique NFTs, ensuring true ownership.
+-   **Manage Tickets**: View all your tickets in one place, each with a unique QR code for entry.
 
 ### For Organizers
 
-- **Create Events**: Easily create new events, uploading metadata and images to IPFS.
-- **Manage Events**: Track ticket sales and attendance in a dedicated dashboard.
-- **Secure Check-in**: Scan attendee QR codes to validate tickets and check them in on-chain.
-- **Decentralized Control**: Full control over event parameters like ticket price and supply.
+-   **Create Events**: Easily create new events, uploading metadata and images to IPFS.
+-   **Manage Events**: Track ticket sales and attendance in a dedicated dashboard.
+-   **Secure Check-in**: Scan attendee QR codes to validate tickets and check them in on-chain.
+-   **Decentralized Control**: Full control over event parameters like ticket price and supply.
 
 ---
 
@@ -50,7 +60,7 @@
 | **Styling**          | [Tailwind CSS](https://tailwindcss.com/), [shadcn/ui](https://ui.shadcn.com/), [Framer Motion](https://www.framer.com/motion/) |
 | **Blockchain**       | [Somnia Network](https://somnia.network/), [Solidity](https://soliditylang.org/)                |
 | **Web3 Integration** | [ethers.js](https://ethers.io/)                                                                        |
-| **Data Indexing**    | **Somnia Subgraphs** (powered by Ormi Labs)                                                            |
+| **Data Indexing**    | [Somnia Subgraphs](https://subgraph.somnia.network/) (powered by Ormi Labs)                                                            |
 | **Decentralized Storage** | [IPFS](https://ipfs.tech/) via [Pinata](https://www.pinata.cloud/)                                       |
 | **State Management** | [Zustand](https://zustand-demo.pmnd.rs/)                                                               |
 
@@ -62,7 +72,8 @@
 
 The application is designed with a decentralized-first approach. The frontend interacts directly with smart contracts for core logic, IPFS for data storage, and Somnia Subgraphs for efficient data querying.
 
-```+----------------------+          1. Create Event          +-----------------------------+
+```
++----------------------+          1. Create Event          +-----------------------------+
 |  Browser Frontend    | -------------------------------> | EventFactory Contract       |
 |  (User / Organizer)  |                                  | (Somnia Network)            |
 +----------------------+                                  +-----------------------------+
@@ -120,8 +131,8 @@ v
 3.  **Data Extraction**: The scanner reads the QR code, which contains a JSON payload like `{ "eventId": "0x...", "ticketId": "1" }`.
 4.  **Validation & Transaction**:
 
-    - The app first verifies that the organizer is authorized to manage the scanned `eventId`.
-    - It then calls the `checkIn` function on the corresponding `Event.sol` contract with the `ticketId`.
+    -   The app first verifies that the organizer is authorized to manage the scanned `eventId`.
+    -   It then calls the `checkIn` function on the corresponding `Event.sol` contract with the `ticketId`.
 
 1.  **On-Chain Update**: The smart contract marks the ticket as checked-in (`isCheckedIn = true`) and emits a `TicketCheckedIn` event. This prevents the same ticket from being used twice.
 
@@ -135,19 +146,19 @@ The contract architecture uses the Factory Pattern for gas efficiency and scalab
 
 This is a singleton contract responsible for creating and tracking all events on the platform.
 
-- **Purpose**: To act as a registry and deployment hub for new events.
-- **Key Function**: `createEvent(string memory metadataCID, uint256 ticketPrice, uint256 ticketSupply)`
-- **Efficiency**: Users pay a predictable, low gas fee to create an event, as the factory's logic is simple. It keeps track of all deployed event contract addresses.
+-   **Purpose**: To act as a registry and deployment hub for new events.
+-   **Key Function**: `createEvent(string memory metadataCID, uint256 ticketPrice, uint256 ticketSupply)`
+-   **Efficiency**: Users pay a predictable, low gas fee to create an event, as the factory's logic is simple. It keeps track of all deployed event contract addresses.
 
 ### `Event.sol`
 
 Each event is its own standalone ERC721 contract, ensuring separation of concerns.
 
-- **Standard**: Inherits from OpenZeppelin's `ERC721Enumerable.sol` to represent each ticket as a unique NFT.
-- **Key Functions**:
-    - `buyTicket()`: Handles the logic for purchasing/minting a ticket.
-    - `checkIn(uint256 tokenId)`: Allows the organizer to mark a ticket as used. It includes an `onlyOwner` modifier to ensure only the event creator can call it.
-- **Scalability**: Since each event is a separate contract, the platform can support countless events without bloating a single master contract.
+-   **Standard**: Inherits from OpenZeppelin's `ERC721Enumerable.sol` to represent each ticket as a unique NFT.
+-   **Key Functions**:
+    -   `buyTicket()`: Handles the logic for purchasing/minting a ticket.
+    -   `checkIn(uint256 tokenId)`: Allows the organizer to mark a ticket as used. It includes an `onlyOwner` modifier to ensure only the event creator can call it.
+-   **Scalability**: Since each event is a separate contract, the platform can support countless events without bloating a single master contract.
 
 ---
 
@@ -160,6 +171,10 @@ Reading data directly from the blockchain is slow, expensive, and not scalable f
 ### How It Works
 
 Our subgraph listens to events emitted by our smart contracts and organizes the data into easily queryable entities.
+
+**Subgraph Details:**
+*   **Public Subgraph Endpoint**: `https://api.subgraph.somnia.network/api/public/2fa4ad73-dae8-47a2-8b88-5e758e66eb86/subgraphs/eventfactory2/0.1/gn`
+*   **Subgraph ID**: `QmT8WrfUQrA4HDgq6rkbExAMg2JU3YsgRFXNfyaS982wru`
 
 ```
 
@@ -220,12 +235,12 @@ v
 
 ```
 
-- **`subgraph.yaml` (The Manifest)**: This file tells the Subgraph Node which contracts to watch. We define the `EventFactory` as a primary data source. Crucially, we use a `template` for the `Event` contract. When `handleEventCreated` is triggered, it dynamically creates a new data source to start indexing the newly deployed event contract.
-- **`schema.graphql`**: Defines the shape of our data. We have two main entities: `Event` and `Ticket`.
-- **`mapping.ts` (The Handlers)**: This is the core logic that translates blockchain events into stored entities.
-    - `handleEventCreated`: Creates a new `Event` entity and instantiates the dynamic template.
-    - `handleTransfer`: If it's a mint, it creates a `Ticket` entity and links it to the parent `Event`.
-    - `handleTicketCheckedIn`: Loads the relevant `Ticket` entity and updates its `isCheckedIn` status.
+-   **`subgraph.yaml` (The Manifest)**: This file tells the Subgraph Node which contracts to watch. We define the `EventFactory` as a primary data source. Crucially, we use a `template` for the `Event` contract. When `handleEventCreated` is triggered, it dynamically creates a new data source to start indexing the newly deployed event contract.
+-   **`schema.graphql`**: Defines the shape of our data. We have two main entities: `Event` and `Ticket`.
+-   **`mapping.ts` (The Handlers)**: This is the core logic that translates blockchain events into stored entities.
+    -   `handleEventCreated`: Creates a new `Event` entity and instantiates the dynamic template.
+    -   `handleTransfer`: If it's a mint, it creates a `Ticket` entity and links it to the parent `Event`.
+    -   `handleTicketCheckedIn`: Loads the relevant `Ticket` entity and updates its `isCheckedIn` status.
 
 ---
 
@@ -233,13 +248,12 @@ v
 
 All event metadata (title, description, images) is stored on IPFS to keep the platform decentralized and to avoid the high cost of storing large data on-chain.
 
-- **Process**: We use the Pinata service to easily "pin" our data to the IPFS network, ensuring it remains available.
-- **On-Chain Link**: The only thing stored on the smart contract is the final metadata CID. The frontend fetches this CID, retrieves the JSON from an IPFS gateway, and then renders the event details.
+-   **Process**: We use the Pinata service to easily "pin" our data to the IPFS network, ensuring it remains available.
+-   **On-Chain Link**: The only thing stored on the smart contract is the final metadata CID. The frontend fetches this CID, retrieves the JSON from an IPFS gateway, and then renders the event details.
 
 **Example `EventMetadata` JSON object uploaded to IPFS:**
 
 ```
-
 {
 "title": "Somnia Genesis Conference",
 "startDate": "2024-12-01T00:00:00.000Z",
@@ -267,13 +281,12 @@ All event metadata (title, description, images) is stored on IPFS to keep the pl
 
 The QR code is the key to the check-in process, bridging the digital NFT ticket with physical event access.
 
-- **Generation**: The QR code is generated client-side in the "My Tickets" page using the `qrcode.react` library.
-- **Data Payload**: To keep it simple and efficient, the QR code contains a stringified JSON object with the minimum data required for validation.
+-   **Generation**: The QR code is generated client-side in the "My Tickets" page using the `qrcode.react` library.
+-   **Data Payload**: To keep it simple and efficient, the QR code contains a stringified JSON object with the minimum data required for validation.
 
 **Example QR Code Data:**
 
 ```
-
 {
 "eventId": "0x9033f9e52E26Ed90D02192ec84E116479a983463",
 "ticketId": "1"
@@ -281,8 +294,8 @@ The QR code is the key to the check-in process, bridging the digital NFT ticket 
 
 ```
 
-- **`eventId`**: The contract address of the event.
-- **`ticketId`**: The unique token ID of the NFT ticket.
+-   **`eventId`**: The contract address of the event.
+-   **`ticketId`**: The unique token ID of the NFT ticket.
 
 This design ensures that no sensitive information is exposed. The validation happens on-chain, making the process trustless and secure.
 
@@ -294,16 +307,15 @@ To run this project locally, follow these steps:
 
 **Prerequisites:**
 
-- Node.js (v18 or later)
-- A package manager (npm, yarn, or pnpm)
-- A browser with a Web3 wallet extension (e.g., MetaMask) configured for the Somnia Testnet.
+-   Node.js (v18 or later)
+-   A package manager (npm, yarn, or pnpm)
+-   A browser with a Web3 wallet extension (e.g., MetaMask) configured for the Somnia Testnet.
 
 **Installation:**
 
 1.  Clone the repository:
 
 ```
-
 git clone <repository-url>
 cd sompass-project
 
@@ -312,7 +324,6 @@ cd sompass-project
 1.  Install dependencies:
 
 ```
-
 npm install
 
 ```
@@ -320,7 +331,6 @@ npm install
 1.  Set up environment variables. Create a `.env` file by copying `.env.example`:
 
 ```
-
 cp .env.example .env
 
 ```
@@ -328,16 +338,14 @@ cp .env.example .env
 Fill in your Pinata API keys in the `.env` file:
 
 ```
-
 VITE_PINATA_API_KEY=your_pinata_api_key
 VITE_PINATA_SECRET_KEY=your_pinata_secret_key
-
+VITE_GEMINI_API_KEY=your_gemini_api_key
 ```
 
 1.  Run the development server:
 
 ```
-
 npm run dev
 ```
 
@@ -347,8 +355,8 @@ The application will be available at `http://localhost:8080`.
 
 ## Future Improvements
 
-- **Secondary Marketplace**: Allow users to buy and sell tickets on an open, secondary market.
-- **Enhanced Analytics**: Provide organizers with more detailed dashboards on sales trends and attendee demographics.
-- **Event Notifications**: Implement a notification system for event updates or reminders.
-- **Multi-chain Support**: Expand the platform to other EVM-compatible chains.
-- **Customizable Tickets**: Allow organizers to create different ticket tiers (e.g., VIP, General Admission).
+-   **Secondary Marketplace**: Allow users to buy and sell tickets on an open, secondary market.
+-   **Enhanced Analytics**: Provide organizers with more detailed dashboards on sales trends and attendee demographics.
+-   **Event Notifications**: Implement a notification system for event updates or reminders.
+-   **Multi-chain Support**: Expand the platform to other EVM-compatible chains.
+-   **Customizable Tickets**: Allow organizers to create different ticket tiers (e.g., VIP, General Admission).
